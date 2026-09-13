@@ -33,6 +33,7 @@ const DIFFICULTY_SPEEDS = {
 let eatAudio = null;
 let crashAudio = null;
 let crashAudio2 = null;
+let clickAudio = null;
 let crashToggle = 0; // alternates between crash.mp3 and crash2.mp3
 
 function preloadSfx() {
@@ -51,9 +52,33 @@ function preloadSfx() {
   try {
     crashAudio2 = new Audio('crash2.mp3');
     crashAudio2.preload = 'auto';
-    crashAudio2.volume = 0.9;
+    crashAudio2.volume = 0.35; // quieter cat laugh
     crashAudio2.load();
   } catch (e) {}
+  try {
+    clickAudio = new Audio('click.wav');
+    clickAudio.preload = 'auto';
+    clickAudio.volume = 0.7;
+    clickAudio.load();
+  } catch (e) {}
+}
+
+function playClickSound() {
+  try {
+    if (!clickAudio) preloadSfx();
+    const a = clickAudio.cloneNode();
+    a.volume = 0.7;
+    a.currentTime = 0;
+    a.play().catch(() => {
+      const b = new Audio('click.wav');
+      b.volume = 0.7;
+      b.play().catch(() => {});
+    });
+  } catch (e) {
+    try {
+      new Audio('click.wav').play().catch(() => {});
+    } catch (_) {}
+  }
 }
 
 function playEatSound() {
@@ -79,16 +104,18 @@ function playEatSound() {
 function playCrashSound() {
   try {
     if (!crashAudio || !crashAudio2) preloadSfx();
-    // Alternate: faah ↔ cat laugh
-    const src = (crashToggle % 2 === 0) ? crashAudio : crashAudio2;
-    const fallback = (crashToggle % 2 === 0) ? 'crash.mp3' : 'crash2.mp3';
+    // Alternate: faah ↔ cat laugh (cat is quieter)
+    const useCat = (crashToggle % 2 === 1);
+    const src = useCat ? crashAudio2 : crashAudio;
+    const fallback = useCat ? 'crash2.mp3' : 'crash.mp3';
+    const vol = useCat ? 0.35 : 0.9;
     crashToggle++;
     const a = src.cloneNode();
-    a.volume = 0.9;
+    a.volume = vol;
     a.currentTime = 0;
     a.play().catch(() => {
       const b = new Audio(fallback);
-      b.volume = 0.9;
+      b.volume = vol;
       b.play().catch(() => {});
     });
   } catch (e) {
@@ -743,6 +770,14 @@ document.getElementById('start-game-btn')?.addEventListener('click', async () =>
         crashAudio2.muted = false;
       }).catch(() => {});
     }
+    if (clickAudio) {
+      clickAudio.muted = true;
+      clickAudio.play().then(() => {
+        clickAudio.pause();
+        clickAudio.currentTime = 0;
+        clickAudio.muted = false;
+      }).catch(() => {});
+    }
   } catch (e) {}
 
   resetGame();
@@ -802,6 +837,21 @@ document.getElementById('play-again-btn')?.addEventListener('click', () => {
   showScreen('game-screen');
   isRunning = true;
   requestAnimationFrame(gameLoop);
+});
+
+// Button click SFX for every button / select
+document.addEventListener('click', (e) => {
+  const t = e.target;
+  if (!t) return;
+  if (
+    t.tagName === 'BUTTON' ||
+    t.closest('button') ||
+    t.tagName === 'SELECT' ||
+    t.classList?.contains('pixel-btn') ||
+    t.classList?.contains('os-btn')
+  ) {
+    playClickSound();
+  }
 });
 
 // Initial draw on load
