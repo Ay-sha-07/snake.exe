@@ -14,6 +14,8 @@ let baseSpeed = 150;           // ms per tick (medium)
 let currentSpeed = baseSpeed;
 let lastTick = 0;
 let score = 0;
+let lives = 3;
+const MAX_LIVES = 3;
 let isGameOver = false;
 let isRunning = false;
 let lastTurnTime = 0;
@@ -33,7 +35,6 @@ const DIFFICULTY_SPEEDS = {
 let eatAudio = null;
 let crashAudio = null;
 let crashAudio2 = null;
-let crashToggle = 0; // alternates between crash.mp3 and crash2.mp3
 
 function preloadSfx() {
   try {
@@ -77,24 +78,32 @@ function playEatSound() {
 }
 
 function playCrashSound() {
+  // Normal life-loss crash (crash.mp3)
   try {
-    if (!crashAudio || !crashAudio2) preloadSfx();
-    // Alternate: faah ↔ cat laugh
-    const src = (crashToggle % 2 === 0) ? crashAudio : crashAudio2;
-    const fallback = (crashToggle % 2 === 0) ? 'crash.mp3' : 'crash2.mp3';
-    crashToggle++;
-    const a = src.cloneNode();
+    if (!crashAudio) preloadSfx();
+    const a = crashAudio ? crashAudio.cloneNode() : new Audio('crash.mp3');
     a.volume = 0.9;
     a.currentTime = 0;
     a.play().catch(() => {
-      const b = new Audio(fallback);
-      b.volume = 0.9;
-      b.play().catch(() => {});
+      new Audio('crash.mp3').play().catch(() => {});
     });
   } catch (e) {
-    try {
-      new Audio('crash.mp3').play().catch(() => {});
-    } catch (_) {}
+    try { new Audio('crash.mp3').play().catch(() => {}); } catch (_) {}
+  }
+}
+
+function playFinalCrashSound() {
+  // Final death / no lives left → crash2 (stronger sting / "bgm")
+  try {
+    if (!crashAudio2) preloadSfx();
+    const a = crashAudio2 ? crashAudio2.cloneNode() : new Audio('crash2.mp3');
+    a.volume = 1.0;
+    a.currentTime = 0;
+    a.play().catch(() => {
+      new Audio('crash2.mp3').play().catch(() => {});
+    });
+  } catch (e) {
+    try { new Audio('crash2.mp3').play().catch(() => {}); } catch (_) {}
   }
 }
 
@@ -369,12 +378,14 @@ function resetGame() {
   direction = 'RIGHT';
   nextDirection = 'RIGHT';
   score = 0;
+  lives = MAX_LIVES;
   currentSpeed = baseSpeed;
   isGameOver = false;
   lastTick = 0;
   lastTurnTime = 0;
   spawnFood();
   updateHud();
+  updateLivesDisplay();
 }
 
 function updateSnake() {
@@ -393,16 +404,16 @@ function updateSnake() {
   if (head.y < 0) head.y = ROWS - 1;
   else if (head.y >= ROWS) head.y = 0;
 
-  // Hit an obstacle wall → crash
+  // Hit an obstacle wall → lose a life
   if (isWall(head.x, head.y)) {
-    gameOver();
+    loseLife();
     return;
   }
 
   // Self collision
   for (const part of snake) {
     if (part.x === head.x && part.y === head.y) {
-      gameOver();
+      loseLife();
       return;
     }
   }
@@ -429,6 +440,67 @@ function updateHud() {
   const lenEl = document.getElementById('len-val');
   if (scoreEl) scoreEl.textContent = String(score).padStart(4, '0');
   if (lenEl) lenEl.textContent = String(snake.length).padStart(3, '0');
+}
+
+function updateLivesDisplay() {
+  const hearts = document.querySelectorAll('#lives-row .heart');
+  hearts.forEach((heart, i) => {
+    if (i < lives) {
+      heart.classList.add('full');
+    } else {
+      heart.classList.remove('full');
+    }
+  });
+}
+
+/* Respawn snake after losing a life (keep score, reset position & length) */
+function respawnSnake() {
+  let startX = 8, startY = 10;
+  if (isWall(startX, startY) || isWall(startX - 1, startY) || isWall(startX - 2, startY)) {
+    startX = 4; startY = 12;
+  }
+  if (isWall(startX, startY)) {
+    startX = 3; startY = 3;
+  }
+  snake = [
+    { x: startX, y: startY },
+    { x: startX - 1, y: startY },
+    { x: startX - 2, y: startY }
+  ];
+  direction = 'RIGHT';
+  nextDirection = 'RIGHT';
+  lastTurnTime = 0;
+  spawnFood();
+  updateHud();
+}
+
+function loseLife() {
+  if (isGameOver) return;
+
+  lives = Math.max(0, lives - 1);
+  updateLivesDisplay();
+
+  const statusEl = document.getElementById('status-text');
+  if (lives > 0) {
+    // Still have lives → normal crash sound + respawn
+    playCrashSound();
+    if (statusEl) statusEl.textContent = lives + ' LIFE' + (lives === 1 ? '' : 'S') + ' LEFT';
+    respawnSnake();
+    // short pause so player sees the crash
+    isRunning = false;
+    setTimeout(() => {
+      if (!isGameOver && lives > 0) {
+        if (statusEl) statusEl.textContent = 'READY';
+        isRunning = true;
+        requestAnimationFrame(gameLoop);
+      }
+    }, 900);
+  } else {
+    // No lives left → play crash2 (final sting / "bgm") then game over
+    playFinalCrashSound();
+    if (statusEl) statusEl.textContent = 'GAME OVER';
+    gameOver();
+  }
 }
 
 /* ---------- Rendering (Nokia green + pixel feel) ---------- */
@@ -546,7 +618,8 @@ function gameOver() {
   isGameOver = true;
   isRunning = false;
 
-  playCrashSound();
+  // Crash sound already played in loseLife(); only play if called directly
+  // (kept for safety / future direct calls)
 
   document.getElementById('final-score').textContent = score;
   document.getElementById('final-len').textContent = snake.length;
@@ -806,4 +879,5 @@ document.getElementById('play-again-btn')?.addEventListener('click', () => {
 
 // Initial draw on load
 resetGame();
+updateLivesDisplay();
 draw();
