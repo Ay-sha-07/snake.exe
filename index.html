@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AYISHA.EXE // Screaming Snake</title>
+  <title>SNAKE.EXE</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,28 +17,92 @@
     <!-- Title Screen -->
     <div id="title-screen" class="screen">
       <div class="pixel-frame">
-        <p class="subtitle">MY TECH JOURNEY</p>
-        <h1 class="title">AYISHA.EXE</h1>
-        <div class="pixel-character">
-          <div class="char-body">
-            <div class="hair"></div>
-            <div class="face">
-              <div class="eye left"></div>
-              <div class="eye right"></div>
-              <div class="mouth"></div>
-            </div>
-            <div class="shirt"></div>
-          </div>
+        <p class="subtitle">"Shut up or crash out"</p>
+        <h1 class="title">SNAKE.EXE</h1>
+
+        <!-- Snake avatar image -->
+        <img src="snake-avatar.png" alt="Snake" class="snake-avatar-img" />
+
+        <p class="instruction">Scream to move. Hum to turn.</p>
+
+        <div class="menu-buttons">
+          <button id="start-btn" class="pixel-btn menu-btn">START</button>
+          <button id="howto-btn" class="pixel-btn menu-btn">HOW TO PLAY</button>
+          <button id="options-btn" class="pixel-btn menu-btn">OPTIONS</button>
+          <button id="leaderboard-btn" class="pixel-btn menu-btn">LEADERBOARD</button>
         </div>
-        <p class="instruction">Walk the grid. Reach the consoles.<br>Scream to move. Hum to turn.</p>
-        <button id="start-btn" class="pixel-btn">PRESS START</button>
-        <p class="controls-hint">ARROW KEYS / WASD TO MOVE · SPACE TO INTERACT<br>
-        <span class="mic-hint">OR USE YOUR VOICE 🎙️</span></p>
+
+        <p class="controls-hint">
+        <span class="mic-hint">USE YOUR VOICE 🎙️</span></p>
+      </div>
+    </div>
+
+    <!-- Name entry screen (after START) -->
+    <div id="name-screen" class="screen hidden">
+      <div class="pixel-frame name-frame">
+        <button id="name-back-btn" class="icon-back" title="Back" aria-label="Back">←</button>
+        <h2 class="name-heading">WHO'S PLAYING?</h2>
+        <p class="name-sub">ENTER YOUR NAME FOR THE LEADERBOARD</p>
+        <input type="text" id="player-name" maxlength="12" placeholder="PLAYER" autocomplete="off" class="name-input-lg" />
+        <button id="start-game-btn" class="pixel-btn menu-btn">START GAME</button>
+      </div>
+    </div>
+
+    <!-- How to Play Modal -->
+    <div id="howto-screen" class="screen hidden">
+      <div class="pixel-frame modal">
+        <h2 class="modal-title">HOW TO PLAY</h2>
+        <div class="howto-content">
+          <p><span class="key">LOW HUM</span> → Turn LEFT (~100–250 Hz)</p>
+          <p><span class="key">HIGH "EEE"</span> → Turn RIGHT (~280+ Hz)</p>
+          <p><span class="key">LOUD VOLUME</span> → Speed Boost (any pitch)</p>
+          <p><span class="key">ARROW / WASD</span> → Keyboard control</p>
+          <p class="tip-text">Watch the PITCH meter to calibrate your voice.</p>
+        </div>
+        <button id="howto-back" class="pixel-btn">BACK</button>
+      </div>
+    </div>
+
+    <!-- Options Modal -->
+    <div id="options-screen" class="screen hidden">
+      <div class="pixel-frame modal">
+        <h2 class="modal-title">OPTIONS</h2>
+        <div class="options-content">
+          <label class="option-row">
+            <span>Microphone</span>
+            <button id="opt-mic-btn" class="pixel-btn small">ON</button>
+          </label>
+          <label class="option-row">
+            <span>Sound FX</span>
+            <button id="opt-sfx-btn" class="pixel-btn small">ON</button>
+          </label>
+          <label class="option-row">
+            <span>Difficulty</span>
+            <select id="opt-difficulty" class="pixel-select">
+              <option value="easy">EASY</option>
+              <option value="medium" selected>MEDIUM</option>
+              <option value="hard">HARD</option>
+            </select>
+          </label>
+        </div>
+        <button id="options-back" class="pixel-btn">BACK</button>
+      </div>
+    </div>
+
+    <!-- Leaderboard Modal -->
+    <div id="leaderboard-screen" class="screen hidden">
+      <div class="pixel-frame modal">
+        <h2 class="modal-title">LEADERBOARD</h2>
+        <div id="leaderboard-list" class="leaderboard-list">
+          <p class="empty">No scores yet. Be the first!</p>
+        </div>
+        <button id="leaderboard-back" class="pixel-btn">BACK</button>
       </div>
     </div>
 
     <!-- Game Screen -->
     <div id="game-screen" class="screen hidden">
+      <button id="back-home-btn" class="icon-back game-back" title="Home" aria-label="Home">←</button>
       <div class="hud">
         <div class="hud-left">
           <div class="score-box">
@@ -97,12 +161,22 @@
         <h2 class="gameover-title">SYSTEM CRASH</h2>
         <p class="final-score">SCORE: <span id="final-score">0</span></p>
         <p class="final-len">SNAKE LENGTH: <span id="final-len">3</span></p>
-        <button id="play-again-btn" class="pixel-btn">TRY AGAIN</button>
+
+        <h3 class="lb-title">LEADERBOARD</h3>
+        <div id="gameover-leaderboard" class="leaderboard-list go-lb"></div>
+
+        <div class="go-buttons">
+          <button id="play-again-btn" class="pixel-btn">TRY AGAIN</button>
+          <button id="go-home-btn" class="pixel-btn">HOME</button>
+        </div>
         <p class="quote">"Every crash is a log entry."</p>
       </div>
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="leaderboard.js"></script>
   <script src="audio.js"></script>
   <script src="game.js"></script>
 </body>

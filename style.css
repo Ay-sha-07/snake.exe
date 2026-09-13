@@ -106,82 +106,196 @@ body {
   letter-spacing: 1px;
 }
 
-/* Simple pixel character (inspired by uploaded GIF) */
-.pixel-character {
-  width: 80px;
-  height: 110px;
-  margin: 0 auto 20px;
-  position: relative;
+/* ===== SNAKE AVATAR IMAGE ===== */
+.snake-avatar-img {
+  display: block;
+  width: 96px;
+  height: auto;
+  margin: 8px auto 16px;
   image-rendering: pixelated;
-}
-
-.char-body {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.hair {
-  position: absolute;
-  top: 0;
-  left: 12px;
-  width: 56px;
-  height: 28px;
-  background: #2a1a1a;
-  border-radius: 4px 4px 0 0;
-  box-shadow:
-    -8px 8px 0 #2a1a1a,
-    8px 8px 0 #2a1a1a,
-    -12px 16px 0 #2a1a1a,
-    12px 16px 0 #2a1a1a;
-}
-
-.face {
-  position: absolute;
-  top: 20px;
-  left: 18px;
-  width: 44px;
-  height: 36px;
-  background: #e8c4a8;
-  border: 2px solid #3a2a2a;
-}
-
-.eye {
-  position: absolute;
-  top: 12px;
-  width: 6px;
-  height: 6px;
-  background: #1a1a1a;
-  border-radius: 1px;
-}
-.eye.left { left: 8px; }
-.eye.right { right: 8px; }
-
-.mouth {
-  position: absolute;
-  bottom: 8px;
-  left: 16px;
-  width: 12px;
-  height: 3px;
-  background: #5a3a3a;
-}
-
-.shirt {
-  position: absolute;
-  top: 56px;
-  left: 14px;
-  width: 52px;
-  height: 40px;
-  background: #8b3a3a;
-  border: 2px solid #4a1a1a;
-  box-shadow: inset 0 -8px 0 #6b2a2a;
+  background: transparent;
+  border: none;
 }
 
 .instruction {
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1.4;
   color: #a0b0c0;
+  margin: 4px 0 14px;
+}
+
+/* Name entry screen */
+.name-frame {
+  position: relative;
+  min-width: 320px;
+  max-width: 520px;
+  padding: 36px 28px 32px;
+}
+
+.name-heading {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 18px;
+  color: var(--nokia-green);
+  text-shadow: var(--glow);
+  margin-bottom: 10px;
+}
+
+.name-sub {
+  font-size: 14px;
+  color: #6a7a8a;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+.name-input-lg {
+  display: block;
+  width: 100%;
+  max-width: 280px;
+  margin: 0 auto 20px;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 14px;
+  background: #0a0e12;
+  color: var(--nokia-green);
+  border: 2px solid var(--nokia-green);
+  box-shadow: 0 0 10px rgba(155, 188, 15, 0.35);
+  padding: 14px 16px;
+  text-align: center;
+  outline: none;
+  text-transform: uppercase;
+}
+
+.name-input-lg:focus {
+  box-shadow: 0 0 16px rgba(155, 188, 15, 0.55);
+}
+
+.icon-back {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 36px;
+  height: 36px;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 16px;
+  line-height: 32px;
+  text-align: center;
+  background: #1a2530;
+  color: var(--nokia-green);
+  border: 2px solid var(--pixel-border);
+  cursor: pointer;
+  padding: 0;
+  z-index: 5;
+}
+
+.icon-back:hover {
+  background: var(--nokia-green);
+  color: #0a0e12;
+}
+
+.icon-back.game-back {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+}
+
+/* ===== MENU BUTTONS ===== */
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.menu-btn {
+  min-width: 220px;
+  font-size: 13px !important;
+  padding: 12px 20px !important;
+}
+
+/* ===== MODALS ===== */
+.modal {
+  max-width: 420px;
+  width: 100%;
+}
+
+.modal-title {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 16px;
+  color: var(--accent);
   margin-bottom: 24px;
+  text-shadow: 2px 2px 0 #8a6a20;
+}
+
+.howto-content p {
+  font-size: 18px;
+  margin: 12px 0;
+  color: #c0d0e0;
+}
+
+.howto-content .key {
+  color: var(--nokia-green);
+  font-family: 'Press Start 2P', cursive;
+  font-size: 11px;
+  background: #1a2530;
+  padding: 4px 8px;
+  border: 2px solid var(--pixel-border);
+  margin-right: 8px;
+}
+
+.tip-text {
+  margin-top: 20px !important;
+  color: #6a7a8a !important;
+  font-size: 15px !important;
+}
+
+.options-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.option-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 18px;
+  color: #c0d0e0;
+}
+
+.pixel-select {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 11px;
+  background: var(--accent);
+  color: #1a1200;
+  border: none;
+  padding: 8px 12px;
+  box-shadow: 3px 3px 0 #8a6a20;
+  cursor: pointer;
+}
+
+.leaderboard-list {
+  min-height: 160px;
+  margin-bottom: 24px;
+  font-size: 18px;
+}
+
+.leaderboard-list .empty {
+  color: #6a7a8a;
+  margin-top: 40px;
+}
+
+.leaderboard-list .entry {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #2a3540;
+  color: var(--nokia-green);
+}
+
+.leaderboard-list .rank {
+  color: var(--accent);
+  margin-right: 12px;
 }
 
 .pixel-btn {
@@ -435,6 +549,35 @@ body {
   font-size: 16px;
   color: #6a7a8a;
   font-style: italic;
+}
+
+.lb-title {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 12px;
+  color: var(--accent);
+  margin: 20px 0 10px;
+  text-shadow: 2px 2px 0 #8a6a20;
+}
+
+.go-lb {
+  min-height: 80px;
+  max-height: 180px;
+  overflow-y: auto;
+  margin-bottom: 16px;
+  text-align: left;
+  padding: 0 8px;
+}
+
+.go-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.go-buttons .pixel-btn {
+  min-width: 200px;
 }
 
 /* Responsive */

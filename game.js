@@ -10,7 +10,7 @@ let snake = [];
 let direction = 'RIGHT';
 let nextDirection = 'RIGHT';
 let food = { x: 0, y: 0 };
-let baseSpeed = 150;           // ms per tick
+let baseSpeed = 150;           // ms per tick (medium)
 let currentSpeed = baseSpeed;
 let lastTick = 0;
 let score = 0;
@@ -18,6 +18,13 @@ let isGameOver = false;
 let isRunning = false;
 let lastTurnTime = 0;
 let useKeyboard = true;        // fallback if mic fails
+let difficulty = 'medium';
+
+const DIFFICULTY_SPEEDS = {
+  easy: 200,
+  medium: 150,
+  hard: 90
+};
 
 // Keyboard fallback (WASD / arrows)
 const keyMap = {
@@ -96,12 +103,15 @@ function processVoiceControls(timestamp) {
   }
 
   // Turn detection with debounce
+  // Low hum ~100–250 Hz = LEFT | High "eee" ~280+ Hz = RIGHT
+  // (Many voices' "eee" lands ~280–400 Hz, so 360 was too strict)
+  // Speed boost is SEPARATE — based on VOLUME only (not pitch)
   if (timestamp - lastTurnTime > 280 && pitch > 0) {
-    if (pitch >= 90 && pitch <= 250) {
+    if (pitch >= 100 && pitch <= 250) {
       turnLeft();
       if (actionEl) actionEl.textContent = '← LEFT';
       lastTurnTime = timestamp;
-    } else if (pitch >= 360) {
+    } else if (pitch >= 280) {
       turnRight();
       if (actionEl) actionEl.textContent = 'RIGHT →';
       lastTurnTime = timestamp;
@@ -126,6 +136,11 @@ function spawnFood() {
 }
 
 function resetGame() {
+  // Apply difficulty speed
+  const sel = document.getElementById('opt-difficulty');
+  if (sel) difficulty = sel.value;
+  baseSpeed = DIFFICULTY_SPEEDS[difficulty] || 150;
+
   snake = [
     { x: 8, y: 10 },
     { x: 7, y: 10 },
@@ -172,7 +187,8 @@ function updateSnake() {
     score += 10;
     spawnFood();
     // slight speed up as you grow
-    if (baseSpeed > 90) baseSpeed -= 2;
+    const minSpeed = difficulty === 'easy' ? 140 : difficulty === 'hard' ? 55 : 90;
+    if (baseSpeed > minSpeed) baseSpeed -= 2;
   } else {
     snake.pop();
   }
@@ -256,14 +272,45 @@ function gameOver() {
   isGameOver = true;
   isRunning = false;
 
+  // Submit score (Supabase + local fallback)
+  saveScore(score);
+
   document.getElementById('final-score').textContent = score;
   document.getElementById('final-len').textContent = snake.length;
 
-  // brief delay so last frame is visible
-  setTimeout(() => {
+  // brief delay so last frame is visible, then show board + leaderboard
+  setTimeout(async () => {
     document.getElementById('game-screen').classList.add('hidden');
     document.getElementById('gameover-screen').classList.remove('hidden');
+    await renderLeaderboardInto('gameover-leaderboard');
   }, 600);
+}
+
+async function renderLeaderboardInto(containerId) {
+  const list = document.getElementById(containerId);
+  if (!list) return;
+  list.innerHTML = '<p class="empty">Loading...</p>';
+
+  if (typeof fetchTopScores !== 'function') {
+    list.innerHTML = '<p class="empty">No scores yet</p>';
+    return;
+  }
+
+  try {
+    // small delay so submit can finish
+    await new Promise((r) => setTimeout(r, 400));
+    const { entries } = await fetchTopScores(10);
+    if (!entries || entries.length === 0) {
+      list.innerHTML = '<p class="empty">No scores yet. Be the first!</p>';
+      return;
+    }
+    list.innerHTML = entries.map((s, i) =>
+      `<div class="entry"><span><span class="rank">#${i + 1}</span>${s.name || 'PLAYER'}</span><span>${s.score} pts</span></div>`
+    ).join('');
+  } catch (err) {
+    console.warn(err);
+    list.innerHTML = '<p class="empty">Could not load scores</p>';
+  }
 }
 
 /* ---------- Main loop ---------- */
@@ -283,30 +330,135 @@ function gameLoop(timestamp) {
 
 /* ---------- UI wiring ---------- */
 function showScreen(id) {
-  ['title-screen', 'game-screen', 'gameover-screen'].forEach(s => {
-    document.getElementById(s).classList.add('hidden');
+  const screens = [
+    'title-screen', 'name-screen', 'game-screen', 'gameover-screen',
+    'howto-screen', 'options-screen', 'leaderboard-screen'
+  ];
+  screens.forEach(s => {
+    const el = document.getElementById(s);
+    if (el) el.classList.add('hidden');
   });
-  document.getElementById(id).classList.remove('hidden');
+  const target = document.getElementById(id);
+  if (target) target.classList.remove('hidden');
 }
 
-document.getElementById('start-btn').addEventListener('click', async () => {
-  const btn = document.getElementById('start-btn');
-  btn.textContent = 'LOADING...';
-  btn.disabled = true;
+/* Leaderboard helpers — uses teammate Supabase backend (leaderboard.js) */
+function getPlayerName() {
+  const input = document.getElementById('player-name');
+  const name = (input?.value || '').trim().toUpperCase();
+  return name || 'PLAYER';
+}
+
+function getModeLabel() {
+  return difficulty || 'medium';
+}
+
+function saveScore(score) {
+  // Fire-and-forget; leaderboard.js handles Supabase + local fallback
+  if (typeof submitScore === 'function') {
+    submitScore(getPlayerName(), score, snake.length, getModeLabel())
+      .then((res) => console.log('[LEADERBOARD] submit:', res))
+      .catch((err) => console.warn('[LEADERBOARD] submit error:', err));
+  }
+}
+
+async function renderLeaderboard() {
+  const list = document.getElementById('leaderboard-list');
+  if (!list) return;
+  list.innerHTML = '<p class="empty">Loading...</p>';
+
+  if (typeof fetchTopScores !== 'function') {
+    list.innerHTML = '<p class="empty">Leaderboard unavailable</p>';
+    return;
+  }
+
+  try {
+    const { entries, source } = await fetchTopScores(10);
+    if (!entries || entries.length === 0) {
+      list.innerHTML = '<p class="empty">No scores yet. Be the first!</p>';
+      return;
+    }
+    list.innerHTML = entries.map((s, i) =>
+      `<div class="entry"><span><span class="rank">#${i + 1}</span>${s.name || 'PLAYER'}</span><span>${s.score} pts</span></div>`
+    ).join('');
+    if (source) {
+      list.insertAdjacentHTML('beforeend', `<p class="empty" style="margin-top:12px;font-size:12px">source: ${source}</p>`);
+    }
+  } catch (err) {
+    console.warn(err);
+    list.innerHTML = '<p class="empty">Could not load scores</p>';
+  }
+}
+
+/* START on title → name screen */
+document.getElementById('start-btn').addEventListener('click', () => {
+  showScreen('name-screen');
+  const input = document.getElementById('player-name');
+  if (input) {
+    input.focus();
+    input.select?.();
+  }
+});
+
+/* START GAME on name screen → actually begin */
+document.getElementById('start-game-btn')?.addEventListener('click', async () => {
+  const btn = document.getElementById('start-game-btn');
+  if (btn) {
+    btn.textContent = 'LOADING...';
+    btn.disabled = true;
+  }
 
   const ok = await initAudio();
   if (!ok) {
-    // still allow keyboard play
-    document.getElementById('status-text').textContent = 'KEYBOARD MODE';
+    const st = document.getElementById('status-text');
+    if (st) st.textContent = 'KEYBOARD MODE';
   }
 
   resetGame();
   showScreen('game-screen');
   isRunning = true;
   requestAnimationFrame(gameLoop);
+
+  if (btn) {
+    btn.textContent = 'START GAME';
+    btn.disabled = false;
+  }
 });
 
-document.getElementById('mute-btn').addEventListener('click', toggleMic);
+/* Enter key on name field */
+document.getElementById('player-name')?.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('start-game-btn')?.click();
+});
+
+/* Menu navigation */
+document.getElementById('howto-btn')?.addEventListener('click', () => showScreen('howto-screen'));
+document.getElementById('options-btn')?.addEventListener('click', () => showScreen('options-screen'));
+document.getElementById('leaderboard-btn')?.addEventListener('click', () => {
+  renderLeaderboard();
+  showScreen('leaderboard-screen');
+});
+
+document.getElementById('howto-back')?.addEventListener('click', () => showScreen('title-screen'));
+document.getElementById('options-back')?.addEventListener('click', () => showScreen('title-screen'));
+document.getElementById('leaderboard-back')?.addEventListener('click', () => showScreen('title-screen'));
+document.getElementById('name-back-btn')?.addEventListener('click', () => showScreen('title-screen'));
+
+/* Options toggles */
+document.getElementById('opt-mic-btn')?.addEventListener('click', (e) => {
+  toggleMic();
+  e.target.textContent = micEnabled ? 'ON' : 'OFF';
+});
+
+document.getElementById('mute-btn')?.addEventListener('click', toggleMic);
+
+function goHome() {
+  isRunning = false;
+  isGameOver = false;
+  showScreen('title-screen');
+}
+
+document.getElementById('back-home-btn')?.addEventListener('click', goHome);
+document.getElementById('go-home-btn')?.addEventListener('click', goHome);
 
 document.getElementById('restart-btn')?.addEventListener('click', () => {
   resetGame();
@@ -314,13 +466,13 @@ document.getElementById('restart-btn')?.addEventListener('click', () => {
   requestAnimationFrame(gameLoop);
 });
 
-document.getElementById('play-again-btn').addEventListener('click', () => {
+document.getElementById('play-again-btn')?.addEventListener('click', () => {
   resetGame();
   showScreen('game-screen');
   isRunning = true;
   requestAnimationFrame(gameLoop);
 });
 
-// Initial draw on load (nice static board)
+// Initial draw on load
 resetGame();
 draw();

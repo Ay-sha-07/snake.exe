@@ -53,7 +53,7 @@ function getPitch() {
   const SIZE = dataArray.length;
   const rms = getVolume();
 
-  // Raise threshold for noisy environments (hackathon halls)
+  // Silence / noise floor (original sensitivity)
   if (rms < 0.04) return -1;
 
   // Trim to non-silent region
