@@ -1,0 +1,3 @@
+
+const SUPABASE_URL = 'https://shbalbulkyzckplavftb.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNoYmFsYnVsa3l6Y2twbGF2ZnRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyNjkyMjIsImV4cCI6MjEwNDg0NTIyMn0.1wNqVqGtw3PP8CKcAuhq-sRixHhCj4qT2kP8HZpo0zY';
