@@ -167,12 +167,14 @@ body::before {
 .os-title {
   flex: 1;
   font-family: 'Press Start 2P', cursive;
-  font-size: 9px;
+  font-size: 10px;
   color: #a0b0c0;
-  letter-spacing: 0.5px;
+  letter-spacing: 0;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible;          /* no more cut-off */
+  text-overflow: clip;
+  min-width: 0;
+  text-align: center;
 }
 
 .os-icon {
