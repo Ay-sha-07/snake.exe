@@ -42,7 +42,11 @@ function getVolume() {
   return Math.sqrt(sumSquares / dataArray.length); // 0.0 – ~1.0
 }
 
-
+/**
+ * Pitch detection
+ * - Autocorrelation: solid for low "hmm"
+ * - ZCR: catches high "eeee" when auto locks onto a subharmonic
+ */
 function getPitch() {
   if (!isAudioReady || !micEnabled) return -1;
 
@@ -53,7 +57,7 @@ function getPitch() {
 
   if (rms < 0.045) return -1;  // higher floor → fewer false triggers from quiet noise
 
-  
+  // Zero-crossing estimate
   let crossings = 0;
   for (let i = 1; i < SIZE; i++) {
     if ((dataArray[i - 1] >= 0 && dataArray[i] < 0) ||

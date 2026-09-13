@@ -169,13 +169,13 @@ body::before {
   flex: 1;
   font-family: 'Press Start 2P', cursive;
   font-size: 10px;
-  color: #8fbc8f;
+  color: var(--accent);       /* same yellow as buttons */
   letter-spacing: 0;
   white-space: nowrap;
-  overflow: visible;          /* no more cut-off */
+  overflow: visible;
   text-overflow: clip;
   min-width: 0;
-  text-align: center;
+  text-align: left;
 }
 
 .os-icon {
