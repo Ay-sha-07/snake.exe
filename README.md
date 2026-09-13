@@ -74,7 +74,7 @@ Then open `http://localhost:8000` and allow microphone access.
 
 ### Diagrams
 
-![System Workflow](assets/workflow.png)  
+![System Workflow](assets/workflow.jpg)  
 *Complete system workflow: Microphone → Pitch Detection → Direction Control → Game Loop → Canvas Rendering + Leaderboard submission.*
 
 ## Project Demo
