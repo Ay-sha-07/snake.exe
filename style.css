@@ -1,0 +1,447 @@
+/* ===== RETRO NOKIA + PIXEL TECH VIBE ===== */
+:root {
+  --bg-dark: #0a0c0f;
+  --bg-panel: #111820;
+  --nokia-green: #9bbc0f;
+  --nokia-dark: #0f380f;
+  --nokia-mid: #306230;
+  --accent: #f0c040;
+  --accent-hot: #ff6b35;
+  --text: #e0e8f0;
+  --pixel-border: #3a4a5a;
+  --scanline: rgba(0, 0, 0, 0.15);
+  --glow: 0 0 8px rgba(155, 188, 15, 0.6);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg-dark);
+  color: var(--text);
+  font-family: 'VT323', monospace;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+/* CRT / Scanline effects */
+.scanlines {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    var(--scanline) 2px,
+    var(--scanline) 4px
+  );
+  z-index: 100;
+  opacity: 0.4;
+}
+
+.crt-overlay {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.45) 100%);
+  z-index: 99;
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 640px;
+  padding: 12px;
+}
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ===== TITLE SCREEN ===== */
+.pixel-frame {
+  background: var(--bg-panel);
+  border: 4px solid var(--pixel-border);
+  box-shadow:
+    0 0 0 4px #1a2530,
+    0 0 30px rgba(155, 188, 15, 0.15),
+    inset 0 0 40px rgba(0,0,0,0.5);
+  padding: 32px 24px;
+  text-align: center;
+  image-rendering: pixelated;
+}
+
+.subtitle {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 10px;
+  color: var(--nokia-green);
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+  text-shadow: var(--glow);
+}
+
+.title {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 28px;
+  color: var(--accent);
+  text-shadow:
+    3px 3px 0 #8a6a20,
+    0 0 20px rgba(240, 192, 64, 0.5);
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+/* Simple pixel character (inspired by uploaded GIF) */
+.pixel-character {
+  width: 80px;
+  height: 110px;
+  margin: 0 auto 20px;
+  position: relative;
+  image-rendering: pixelated;
+}
+
+.char-body {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.hair {
+  position: absolute;
+  top: 0;
+  left: 12px;
+  width: 56px;
+  height: 28px;
+  background: #2a1a1a;
+  border-radius: 4px 4px 0 0;
+  box-shadow:
+    -8px 8px 0 #2a1a1a,
+    8px 8px 0 #2a1a1a,
+    -12px 16px 0 #2a1a1a,
+    12px 16px 0 #2a1a1a;
+}
+
+.face {
+  position: absolute;
+  top: 20px;
+  left: 18px;
+  width: 44px;
+  height: 36px;
+  background: #e8c4a8;
+  border: 2px solid #3a2a2a;
+}
+
+.eye {
+  position: absolute;
+  top: 12px;
+  width: 6px;
+  height: 6px;
+  background: #1a1a1a;
+  border-radius: 1px;
+}
+.eye.left { left: 8px; }
+.eye.right { right: 8px; }
+
+.mouth {
+  position: absolute;
+  bottom: 8px;
+  left: 16px;
+  width: 12px;
+  height: 3px;
+  background: #5a3a3a;
+}
+
+.shirt {
+  position: absolute;
+  top: 56px;
+  left: 14px;
+  width: 52px;
+  height: 40px;
+  background: #8b3a3a;
+  border: 2px solid #4a1a1a;
+  box-shadow: inset 0 -8px 0 #6b2a2a;
+}
+
+.instruction {
+  font-size: 18px;
+  line-height: 1.4;
+  color: #a0b0c0;
+  margin-bottom: 24px;
+}
+
+.pixel-btn {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 14px;
+  background: var(--accent);
+  color: #1a1200;
+  border: none;
+  padding: 14px 28px;
+  cursor: pointer;
+  box-shadow:
+    4px 4px 0 #8a6a20,
+    0 0 0 2px #1a1200;
+  transition: all 0.08s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.pixel-btn:hover {
+  background: #ffe070;
+  transform: translate(-2px, -2px);
+  box-shadow:
+    6px 6px 0 #8a6a20,
+    0 0 0 2px #1a1200;
+}
+
+.pixel-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow:
+    2px 2px 0 #8a6a20,
+    0 0 0 2px #1a1200;
+}
+
+.pixel-btn.small {
+  font-size: 10px;
+  padding: 8px 14px;
+}
+
+.controls-hint {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #6a7a8a;
+  line-height: 1.5;
+}
+
+.mic-hint {
+  color: var(--nokia-green);
+  font-size: 16px;
+}
+
+/* ===== GAME HUD ===== */
+.hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 520px;
+  margin-bottom: 10px;
+  gap: 8px;
+}
+
+.hud-left, .hud-right {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 100px;
+}
+
+.hud-center {
+  text-align: center;
+  flex: 1;
+}
+
+.game-title {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 12px;
+  color: var(--nokia-green);
+  text-shadow: var(--glow);
+  margin-bottom: 4px;
+}
+
+.status {
+  font-size: 16px;
+  color: var(--accent);
+  letter-spacing: 1px;
+}
+
+.score-box, .lives-box {
+  background: var(--bg-panel);
+  border: 2px solid var(--pixel-border);
+  padding: 6px 10px;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 10px;
+}
+
+.score-box .label, .lives-box .label {
+  display: block;
+  color: #6a7a8a;
+  font-size: 8px;
+  margin-bottom: 2px;
+}
+
+#score-val, #len-val {
+  color: var(--nokia-green);
+  font-size: 14px;
+}
+
+.meter {
+  background: var(--bg-panel);
+  border: 2px solid var(--pixel-border);
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.meter .label {
+  color: #6a7a8a;
+  font-size: 10px;
+  display: block;
+}
+
+.bar-container {
+  width: 80px;
+  height: 8px;
+  background: #1a2530;
+  margin: 3px 0;
+  border: 1px solid #2a3540;
+  position: relative;
+  overflow: hidden;
+}
+
+.bar {
+  height: 100%;
+  width: 0%;
+  background: var(--nokia-green);
+  transition: width 0.05s linear;
+  box-shadow: 0 0 6px var(--nokia-green);
+}
+
+.bar-container.pitch .bar {
+  background: var(--accent-hot);
+  box-shadow: 0 0 6px var(--accent-hot);
+}
+
+#vol-val, #pitch-val {
+  font-size: 11px;
+  color: #a0b0c0;
+}
+
+/* ===== CANVAS / NOKIA BEZEL ===== */
+.canvas-wrapper {
+  position: relative;
+  background: #1a1f24;
+  padding: 16px 20px 24px;
+  border-radius: 24px 24px 32px 32px;
+  box-shadow:
+    0 0 0 6px #2a323a,
+    0 0 0 10px #1a2228,
+    0 12px 30px rgba(0,0,0,0.6),
+    inset 0 2px 0 rgba(255,255,255,0.05);
+}
+
+.nokia-speaker {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background: #0a0e12;
+  border-radius: 2px;
+  box-shadow: inset 0 1px 2px #000;
+}
+
+#gameCanvas {
+  display: block;
+  background: var(--nokia-dark);
+  border: 3px solid #0a1a0a;
+  image-rendering: pixelated;
+  box-shadow:
+    inset 0 0 20px rgba(0,0,0,0.4),
+    0 0 15px rgba(155, 188, 15, 0.15);
+}
+
+/* Action + footer */
+.action-display {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 11px;
+}
+
+#action-val {
+  color: var(--nokia-green);
+  background: var(--bg-panel);
+  border: 2px solid var(--pixel-border);
+  padding: 6px 12px;
+  min-width: 140px;
+  text-align: center;
+}
+
+.speed-normal {
+  color: #6a7a8a;
+}
+.speed-boost {
+  color: var(--accent-hot);
+  text-shadow: 0 0 8px var(--accent-hot);
+  animation: pulse 0.3s infinite alternate;
+}
+
+@keyframes pulse {
+  from { opacity: 0.7; }
+  to { opacity: 1; }
+}
+
+.footer-controls {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.tip {
+  width: 100%;
+  text-align: center;
+  font-size: 13px;
+  color: #5a6a7a;
+  margin-top: 4px;
+}
+
+/* ===== GAME OVER ===== */
+.gameover-title {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 22px;
+  color: var(--accent-hot);
+  text-shadow: 0 0 12px rgba(255, 107, 53, 0.5);
+  margin-bottom: 20px;
+}
+
+.final-score, .final-len {
+  font-size: 22px;
+  margin: 8px 0;
+  color: var(--nokia-green);
+}
+
+.quote {
+  margin-top: 24px;
+  font-size: 16px;
+  color: #6a7a8a;
+  font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 520px) {
+  .title { font-size: 18px; }
+  .hud { flex-direction: column; align-items: center; }
+  .hud-left, .hud-right { flex-direction: row; width: 100%; justify-content: center; }
+  #gameCanvas { width: 320px; height: 320px; }
+  .canvas-wrapper { padding: 12px; }
+}

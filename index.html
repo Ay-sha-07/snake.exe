@@ -1,1 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AYISHA.EXE // Screaming Snake</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="scanlines"></div>
+  <div class="crt-overlay"></div>
 
+  <div class="container">
+    <!-- Title Screen -->
+    <div id="title-screen" class="screen">
+      <div class="pixel-frame">
+        <p class="subtitle">MY TECH JOURNEY</p>
+        <h1 class="title">AYISHA.EXE</h1>
+        <div class="pixel-character">
+          <div class="char-body">
+            <div class="hair"></div>
+            <div class="face">
+              <div class="eye left"></div>
+              <div class="eye right"></div>
+              <div class="mouth"></div>
+            </div>
+            <div class="shirt"></div>
+          </div>
+        </div>
+        <p class="instruction">Walk the grid. Reach the consoles.<br>Scream to move. Hum to turn.</p>
+        <button id="start-btn" class="pixel-btn">PRESS START</button>
+        <p class="controls-hint">ARROW KEYS / WASD TO MOVE · SPACE TO INTERACT<br>
+        <span class="mic-hint">OR USE YOUR VOICE 🎙️</span></p>
+      </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="screen hidden">
+      <div class="hud">
+        <div class="hud-left">
+          <div class="score-box">
+            <span class="label">SCORE</span>
+            <span id="score-val">0000</span>
+          </div>
+          <div class="lives-box">
+            <span class="label">LEN</span>
+            <span id="len-val">003</span>
+          </div>
+        </div>
+        <div class="hud-center">
+          <h2 class="game-title">SCREAMING SNAKE</h2>
+          <div class="status" id="status-text">READY</div>
+        </div>
+        <div class="hud-right">
+          <div class="meter">
+            <span class="label">VOL</span>
+            <div class="bar-container">
+              <div id="vol-bar" class="bar"></div>
+            </div>
+            <span id="vol-val">0.00</span>
+          </div>
+          <div class="meter">
+            <span class="label">PITCH</span>
+            <div class="bar-container pitch">
+              <div id="pitch-bar" class="bar"></div>
+            </div>
+            <span id="pitch-val">--- Hz</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="canvas-wrapper">
+        <canvas id="gameCanvas" width="480" height="480"></canvas>
+        <div class="nokia-bezel">
+          <div class="nokia-speaker"></div>
+        </div>
+      </div>
+
+      <div class="action-display">
+        <span id="action-val">NEUTRAL</span>
+        <span id="speed-indicator" class="speed-normal">1×</span>
+      </div>
+
+      <div class="footer-controls">
+        <button id="mute-btn" class="pixel-btn small">MIC ON</button>
+        <button id="restart-btn" class="pixel-btn small hidden">RESTART</button>
+        <p class="tip">Low hum → LEFT · High scream → RIGHT · LOUD → SPEED BOOST</p>
+      </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameover-screen" class="screen hidden">
+      <div class="pixel-frame">
+        <h2 class="gameover-title">SYSTEM CRASH</h2>
+        <p class="final-score">SCORE: <span id="final-score">0</span></p>
+        <p class="final-len">SNAKE LENGTH: <span id="final-len">3</span></p>
+        <button id="play-again-btn" class="pixel-btn">TRY AGAIN</button>
+        <p class="quote">"Every crash is a log entry."</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="audio.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
