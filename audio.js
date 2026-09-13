@@ -55,7 +55,7 @@ function getPitch() {
   const sampleRate = audioCtx.sampleRate;
   const rms = getVolume();
 
-  if (rms < 0.03) return -1;
+  if (rms < 0.045) return -1;  // higher floor → fewer false triggers from quiet noise
 
   // Zero-crossing estimate
   let crossings = 0;
@@ -102,8 +102,8 @@ function getPitch() {
   }
 
   // Case: clear high "eeee" — ZCR high, auto stuck on subharmonic (half freq)
-  if (zcrFreq >= 300 && rms >= 0.04) {
-    if (autoFreq < 0 || zcrFreq > autoFreq * 1.6 || autoFreq < 280) {
+  if (zcrFreq >= 350 && rms >= 0.05) {
+    if (autoFreq < 0 || zcrFreq > autoFreq * 1.6 || autoFreq < 300) {
       return Math.min(zcrFreq, 900);
     }
   }
@@ -116,7 +116,7 @@ function getPitch() {
 
   if (autoFreq > 260 && autoFreq <= 1200) return autoFreq;
   if (autoFreq >= 80) return autoFreq;
-  if (zcrFreq >= 80 && zcrFreq <= 1200 && rms >= 0.04) return zcrFreq;
+  if (zcrFreq >= 80 && zcrFreq <= 1200 && rms >= 0.05) return zcrFreq;
 
   return -1;
 }

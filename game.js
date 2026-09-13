@@ -86,35 +86,29 @@ function processVoiceControls(timestamp) {
     if (pitchBar) pitchBar.style.width = '0%';
   }
 
-  // Volume boost (scream)
-  if (vol > 0.22) {
-    currentSpeed = 65; // ~2.3× faster
-    if (speedInd) {
-      speedInd.textContent = '2×';
-      speedInd.className = 'speed-boost';
-    }
-    if (statusEl) statusEl.textContent = 'BOOST';
-  } else {
-    currentSpeed = baseSpeed;
-    if (speedInd) {
-      speedInd.textContent = '1×';
-      speedInd.className = 'speed-normal';
-    }
-    if (statusEl && statusEl.textContent === 'BOOST') statusEl.textContent = 'RUNNING';
+  // No speed boost — keep steady speed (user requested)
+  currentSpeed = baseSpeed;
+  if (speedInd) {
+    speedInd.textContent = '1×';
+    speedInd.className = 'speed-normal';
+  }
+  if (statusEl && (statusEl.textContent === 'BOOST' || statusEl.textContent === '')) {
+    statusEl.textContent = 'RUNNING';
   }
 
-  // Turn detection (balanced sensitivity)
-  // Low hum ~90–250 Hz = LEFT | High "eee" ~300+ Hz = RIGHT
-  // Mid gap ignored; soft noise still filtered in getPitch()
+  // Turn detection — less sensitive to reduce false triggers
+  // Low "mmm / hum" ~100–220 Hz = LEFT
+  // High "eee / whistle" ~380+ Hz = RIGHT
+  // Big mid gap + higher volume floor + longer cooldown
   let zone = 'none';
-  if (pitch >= 90 && pitch <= 250) zone = 'low';
-  else if (pitch >= 300) zone = 'high';
+  if (pitch >= 100 && pitch <= 220) zone = 'low';
+  else if (pitch >= 380) zone = 'high';
   else if (pitch > 0) zone = 'mid';
 
   if (pitch <= 0) {
     if (actionEl) actionEl.textContent = 'SILENT';
     lastVoiceZone = 'none';
-  } else if (timestamp - lastTurnTime > 280) {
+  } else if (timestamp - lastTurnTime > 420) {   // was 280 → slower reaction, fewer false turns
     if (zone === 'low' && lastVoiceZone !== 'low') {
       turnLeft();
       if (actionEl) actionEl.textContent = '← LEFT';
