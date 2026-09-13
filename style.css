@@ -103,7 +103,7 @@ body::before {
 
 .subtitle {
   font-family: 'Press Start 2P', cursive;
-  font-size: 10px;
+  font-size: 8px;
   color: var(--nokia-green);
   letter-spacing: 2px;
   margin-bottom: 8px;
@@ -591,6 +591,7 @@ body::before {
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 14px;
   font-family: 'Press Start 2P', cursive;
   font-size: 12px;
 }
@@ -600,7 +601,7 @@ body::before {
   background: var(--bg-panel);
   border: 2px solid var(--pixel-border);
   padding: 8px 18px;
-  min-width: 160px;
+  min-width: 140px;
   text-align: center;
   letter-spacing: 1px;
 }

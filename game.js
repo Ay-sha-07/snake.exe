@@ -86,14 +86,21 @@ function processVoiceControls(timestamp) {
     if (pitchBar) pitchBar.style.width = '0%';
   }
 
-  // No speed boost — keep steady speed (user requested)
-  currentSpeed = baseSpeed;
-  if (speedInd) {
-    speedInd.textContent = '1×';
-    speedInd.className = 'speed-normal';
-  }
-  if (statusEl && (statusEl.textContent === 'BOOST' || statusEl.textContent === '')) {
-    statusEl.textContent = 'RUNNING';
+  // Volume boost (scream) → 2× speed
+  if (vol > 0.22) {
+    currentSpeed = 65; // ~2.3× faster
+    if (speedInd) {
+      speedInd.textContent = '2×';
+      speedInd.className = 'speed-boost';
+    }
+    if (statusEl) statusEl.textContent = 'BOOST';
+  } else {
+    currentSpeed = baseSpeed;
+    if (speedInd) {
+      speedInd.textContent = '1×';
+      speedInd.className = 'speed-normal';
+    }
+    if (statusEl && statusEl.textContent === 'BOOST') statusEl.textContent = 'RUNNING';
   }
 
   // Turn detection
