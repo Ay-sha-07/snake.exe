@@ -124,26 +124,92 @@ body {
   margin: 4px 0 14px;
 }
 
-/* Name entry screen */
-.name-frame {
-  position: relative;
-  min-width: 320px;
-  max-width: 520px;
-  padding: 36px 28px 32px;
+/* ===== COMPUTER WINDOW (name / login) ===== */
+.os-window {
+  width: 100%;
+  max-width: 480px;
+  background: #0d1218;
+  border: 3px solid #3a4a5a;
+  box-shadow:
+    0 0 0 2px #1a222c,
+    8px 8px 0 rgba(0, 0, 0, 0.45),
+    0 0 40px rgba(155, 188, 15, 0.12);
+  image-rendering: pixelated;
+}
+
+.os-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(180deg, #2a3a4a 0%, #1a2530 100%);
+  border-bottom: 2px solid #3a4a5a;
+  padding: 6px 8px;
+  min-height: 36px;
+}
+
+.os-title {
+  flex: 1;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 9px;
+  color: #a0b0c0;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.os-btn {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 12px;
+  line-height: 24px;
+  text-align: center;
+  background: #1a2530;
+  color: var(--nokia-green);
+  border: 2px solid #3a4a5a;
+  cursor: pointer;
+  padding: 0;
+}
+
+.os-btn:hover {
+  background: var(--nokia-green);
+  color: #0a0e12;
+}
+
+.os-btn-dead {
+  color: #5a6a7a;
+  cursor: default;
+  pointer-events: none;
+}
+
+.os-body {
+  padding: 28px 24px 32px;
+  text-align: center;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(0, 0, 0, 0.08) 3px,
+      rgba(0, 0, 0, 0.08) 4px
+    ),
+    #0d1218;
 }
 
 .name-heading {
   font-family: 'Press Start 2P', cursive;
-  font-size: 18px;
+  font-size: 16px;
   color: var(--nokia-green);
   text-shadow: var(--glow);
   margin-bottom: 10px;
 }
 
 .name-sub {
-  font-size: 14px;
+  font-size: 13px;
   color: #6a7a8a;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
   letter-spacing: 1px;
 }
 
@@ -151,10 +217,10 @@ body {
   display: block;
   width: 100%;
   max-width: 280px;
-  margin: 0 auto 20px;
+  margin: 0 auto 22px;
   font-family: 'Press Start 2P', cursive;
   font-size: 14px;
-  background: #0a0e12;
+  background: #05080c;
   color: var(--nokia-green);
   border: 2px solid var(--nokia-green);
   box-shadow: 0 0 10px rgba(155, 188, 15, 0.35);
@@ -168,10 +234,11 @@ body {
   box-shadow: 0 0 16px rgba(155, 188, 15, 0.55);
 }
 
-.icon-back {
-  position: absolute;
-  top: 12px;
-  left: 12px;
+/* Back arrow on game screen (not in window) */
+.icon-back.game-back {
+  position: fixed;
+  top: 16px;
+  left: 16px;
   width: 36px;
   height: 36px;
   font-family: 'Press Start 2P', cursive;
@@ -183,18 +250,12 @@ body {
   border: 2px solid var(--pixel-border);
   cursor: pointer;
   padding: 0;
-  z-index: 5;
+  z-index: 20;
 }
 
-.icon-back:hover {
+.icon-back.game-back:hover {
   background: var(--nokia-green);
   color: #0a0e12;
-}
-
-.icon-back.game-back {
-  position: fixed;
-  top: 16px;
-  left: 16px;
 }
 
 /* ===== MENU BUTTONS ===== */

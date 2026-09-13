@@ -37,14 +37,20 @@
       </div>
     </div>
 
-    <!-- Name entry screen (after START) -->
+    <!-- Name entry screen (after START) — computer window style -->
     <div id="name-screen" class="screen hidden">
-      <div class="pixel-frame name-frame">
-        <button id="name-back-btn" class="icon-back" title="Back" aria-label="Back">←</button>
-        <h2 class="name-heading">WHO'S PLAYING?</h2>
-        <p class="name-sub">ENTER YOUR NAME FOR THE LEADERBOARD</p>
-        <input type="text" id="player-name" maxlength="12" placeholder="PLAYER" autocomplete="off" class="name-input-lg" />
-        <button id="start-game-btn" class="pixel-btn menu-btn">START GAME</button>
+      <div class="os-window">
+        <div class="os-titlebar">
+          <button id="name-back-btn" class="os-btn" title="Back" aria-label="Back">←</button>
+          <span class="os-title">SNAKE.EXE — LOGIN</span>
+          <span class="os-btn os-btn-dead">×</span>
+        </div>
+        <div class="os-body">
+          <h2 class="name-heading">WHO'S PLAYING?</h2>
+          <p class="name-sub">ENTER YOUR NAME FOR THE LEADERBOARD</p>
+          <input type="text" id="player-name" maxlength="12" placeholder="PLAYER" autocomplete="off" class="name-input-lg" />
+          <button id="start-game-btn" class="pixel-btn menu-btn">START GAME</button>
+        </div>
       </div>
     </div>
 
