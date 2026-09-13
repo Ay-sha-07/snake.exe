@@ -43,9 +43,9 @@ function getVolume() {
 }
 
 /**
- * Pitch detection — autocorrelation primary (stable for hum).
- * ZCR only as backup for clear high tones when auto fails.
- * Higher noise floor to ignore room disturbances.
+ * Pitch detection
+ * - Autocorrelation: solid for low "hmm"
+ * - ZCR: catches high "eeee" when auto locks onto a subharmonic
  */
 function getPitch() {
   if (!isAudioReady || !micEnabled) return -1;
@@ -55,10 +55,19 @@ function getPitch() {
   const sampleRate = audioCtx.sampleRate;
   const rms = getVolume();
 
-  // Ignore quiet room noise / keyboard clicks
   if (rms < 0.03) return -1;
 
-  // --- Autocorrelation (best for low "hmm") ---
+  // Zero-crossing estimate
+  let crossings = 0;
+  for (let i = 1; i < SIZE; i++) {
+    if ((dataArray[i - 1] >= 0 && dataArray[i] < 0) ||
+        (dataArray[i - 1] < 0 && dataArray[i] >= 0)) {
+      crossings++;
+    }
+  }
+  const zcrFreq = (crossings / 2) / (SIZE / sampleRate);
+
+  // Autocorrelation
   let r1 = 0;
   let r2 = SIZE - 1;
   const thres = 0.2;
@@ -81,7 +90,7 @@ function getPitch() {
     while (d < c.length - 1 && c[d] > c[d + 1]) d++;
     let maxval = -1;
     let maxpos = -1;
-    const minLag = Math.floor(sampleRate / 800);
+    const minLag = Math.floor(sampleRate / 900);
     const maxLag = Math.floor(sampleRate / 80);
     for (let i = Math.max(d, minLag); i < Math.min(c.length, maxLag); i++) {
       if (c[i] > maxval) {
@@ -92,28 +101,22 @@ function getPitch() {
     if (maxpos > 0) autoFreq = sampleRate / maxpos;
   }
 
-  // If autocorrelation found a clear low/mid pitch, trust it
-  // (don't let noisy ZCR flip "hmm" into a right turn)
-  if (autoFreq >= 80 && autoFreq <= 280) {
-    return autoFreq;
-  }
-
-  // --- ZCR only when auto missed — and only for strong high tones ---
-  let crossings = 0;
-  for (let i = 1; i < SIZE; i++) {
-    if ((dataArray[i - 1] >= 0 && dataArray[i] < 0) ||
-        (dataArray[i - 1] < 0 && dataArray[i] >= 0)) {
-      crossings++;
+  // Case: clear high "eeee" — ZCR high, auto stuck on subharmonic (half freq)
+  if (zcrFreq >= 300 && rms >= 0.04) {
+    if (autoFreq < 0 || zcrFreq > autoFreq * 1.6 || autoFreq < 280) {
+      return Math.min(zcrFreq, 900);
     }
   }
-  const zcrFreq = (crossings / 2) / (SIZE / sampleRate);
 
-  // ZCR backup for high "eee" when autocorrelation misses
-  if (zcrFreq >= 300 && rms >= 0.04 && (autoFreq < 0 || autoFreq > 300)) {
-    return Math.min(zcrFreq, 900);
+  // Case: low "hmm" — trust autocorrelation in low band
+  if (autoFreq >= 80 && autoFreq <= 260) {
+    // Only keep low if ZCR is NOT clearly screaming high
+    if (zcrFreq < 300) return autoFreq;
   }
-  if (autoFreq > 280 && autoFreq <= 1200) return autoFreq;
+
+  if (autoFreq > 260 && autoFreq <= 1200) return autoFreq;
   if (autoFreq >= 80) return autoFreq;
+  if (zcrFreq >= 80 && zcrFreq <= 1200 && rms >= 0.04) return zcrFreq;
 
   return -1;
 }
