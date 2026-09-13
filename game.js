@@ -314,20 +314,14 @@ function updateSnake() {
   else if (direction === 'LEFT') head.x -= 1;
   else if (direction === 'RIGHT') head.x += 1;
 
-  // Classic = wraparound; all other modes = solid walls / out-of-bounds = death
-  if (gameMode === 'classic') {
-    if (head.x < 0) head.x = COLS - 1;
-    else if (head.x >= COLS) head.x = 0;
-    if (head.y < 0) head.y = ROWS - 1;
-    else if (head.y >= ROWS) head.y = 0;
-  } else {
-    if (head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS || isWall(head.x, head.y)) {
-      gameOver();
-      return;
-    }
-  }
+  // Always wrap around edges (like Classic).
+  // Modes with border walls (e.g. Box) still kill you because those cells are walls.
+  if (head.x < 0) head.x = COLS - 1;
+  else if (head.x >= COLS) head.x = 0;
+  if (head.y < 0) head.y = ROWS - 1;
+  else if (head.y >= ROWS) head.y = 0;
 
-  // Wall collision (also for classic if any walls ever exist)
+  // Hit an obstacle wall → crash
   if (isWall(head.x, head.y)) {
     gameOver();
     return;
@@ -346,6 +340,12 @@ function updateSnake() {
   // Eat food
   if (head.x === food.x && head.y === food.y) {
     score += 10;
+    // Eat apple sound (~5s clip)
+    try {
+      const eatSfx = new Audio('eat.mp3');
+      eatSfx.volume = 0.85;
+      eatSfx.play().catch(() => {});
+    } catch (e) {}
     spawnFood();
     // slight speed up as you grow
     const minSpeed = difficulty === 'easy' ? 140 : difficulty === 'hard' ? 55 : 90;
@@ -477,6 +477,13 @@ function draw() {
 function gameOver() {
   isGameOver = true;
   isRunning = false;
+
+  // Play system crash sound
+  try {
+    const crashSfx = new Audio('crash.mp3');
+    crashSfx.volume = 0.9;
+    crashSfx.play().catch(() => {});
+  } catch (e) {}
 
   document.getElementById('final-score').textContent = score;
   document.getElementById('final-len').textContent = snake.length;
