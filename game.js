@@ -96,31 +96,39 @@ function processVoiceControls(timestamp) {
     statusEl.textContent = 'RUNNING';
   }
 
-  // Turn detection — less sensitive to reduce false triggers
-  // Low "mmm / hum" ~100–220 Hz = LEFT
-  // High "eee / whistle" ~380+ Hz = RIGHT
-  // Big mid gap + higher volume floor + longer cooldown
+  // Turn detection
+  // Low "mmm / hum" ~80–280 Hz = LEFT   (widened so real hums register)
+  // High "eee / whistle" ~340+ Hz = RIGHT
+  // Mid gap still ignored to reduce noise
   let zone = 'none';
-  if (pitch >= 100 && pitch <= 220) zone = 'low';
-  else if (pitch >= 380) zone = 'high';
+  if (pitch >= 80 && pitch <= 280) zone = 'low';
+  else if (pitch >= 340) zone = 'high';
   else if (pitch > 0) zone = 'mid';
 
   if (pitch <= 0) {
     if (actionEl) actionEl.textContent = 'SILENT';
     lastVoiceZone = 'none';
-  } else if (timestamp - lastTurnTime > 420) {   // was 280 → slower reaction, fewer false turns
-    if (zone === 'low' && lastVoiceZone !== 'low') {
-      turnLeft();
+  } else {
+    // Always update the status label so player can see the zone
+    if (zone === 'low') {
       if (actionEl) actionEl.textContent = '← LEFT';
-      lastTurnTime = timestamp;
-    } else if (zone === 'high' && lastVoiceZone !== 'high') {
-      turnRight();
+    } else if (zone === 'high') {
       if (actionEl) actionEl.textContent = 'RIGHT →';
-      lastTurnTime = timestamp;
-    } else if (zone === 'mid') {
+    } else {
       if (actionEl) actionEl.textContent = 'CRUISING';
     }
-    lastVoiceZone = zone;
+
+    // Only actually turn when entering the zone + cooldown
+    if (timestamp - lastTurnTime > 380) {
+      if (zone === 'low' && lastVoiceZone !== 'low') {
+        turnLeft();
+        lastTurnTime = timestamp;
+      } else if (zone === 'high' && lastVoiceZone !== 'high') {
+        turnRight();
+        lastTurnTime = timestamp;
+      }
+      lastVoiceZone = zone;
+    }
   }
 }
 
@@ -273,9 +281,6 @@ function gameOver() {
   isGameOver = true;
   isRunning = false;
 
-  // Submit score (Supabase + local fallback)
-  saveScore(score);
-
   document.getElementById('final-score').textContent = score;
   document.getElementById('final-len').textContent = snake.length;
 
@@ -283,6 +288,35 @@ function gameOver() {
   setTimeout(async () => {
     document.getElementById('game-screen').classList.add('hidden');
     document.getElementById('gameover-screen').classList.remove('hidden');
+
+    // Check for HIGH SCORE before (or while) submitting
+    const banner = document.getElementById('highscore-banner');
+    if (banner) banner.classList.add('hidden');
+
+    let isHighScore = false;
+    try {
+      if (typeof fetchTopScores === 'function') {
+        const { entries } = await fetchTopScores(1);
+        const previousTop = (entries && entries[0]) ? entries[0].score : 0;
+        if (score > 0 && score >= previousTop) {
+          isHighScore = true;
+        }
+      } else {
+        // local-only fallback
+        isHighScore = score > 0;
+      }
+    } catch (e) {
+      console.warn('High-score check failed', e);
+      isHighScore = score > 0;
+    }
+
+    if (isHighScore && banner) {
+      banner.classList.remove('hidden');
+    }
+
+    // Submit after we have the previous top
+    saveScore(score);
+
     await renderLeaderboardInto('gameover-leaderboard');
   }, 600);
 }

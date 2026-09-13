@@ -67,10 +67,10 @@
         <div class="os-body">
           <h2 class="modal-title">HOW TO PLAY</h2>
           <div class="howto-content">
-            <p><span class="key">LOW "MMM / HUM"</span> → Turn LEFT (~100–220 Hz)</p>
-            <p><span class="key">HIGH "EEE / WHISTLE"</span> → Turn RIGHT (~380+ Hz)</p>
+            <p><span class="key">LOW "MMM / HUM"</span> → Turn LEFT (~80–280 Hz)</p>
+            <p><span class="key">HIGH "EEE / WHISTLE"</span> → Turn RIGHT (~340+ Hz)</p>
             <p><span class="key">ARROW / WASD</span> → Keyboard control</p>
-            <p class="tip-text">Watch the PITCH meter. Keep volume steady — no speed boost.</p>
+            <p class="tip-text">Watch the PITCH meter. Status shows LEFT / RIGHT / CRUISING.</p>
           </div>
         </div>
       </div>
@@ -175,8 +175,7 @@
           </div>
 
           <div class="action-display">
-            <span id="action-val">NEUTRAL</span>
-            <span id="speed-indicator" class="speed-normal">1×</span>
+            <span id="action-val">SILENT</span>
           </div>
 
           <div class="footer-controls">
@@ -198,6 +197,7 @@
         </div>
         <div class="os-body">
           <h2 class="gameover-title">SYSTEM CRASH</h2>
+          <p id="highscore-banner" class="highscore-banner hidden">HIGH SCORE!!!</p>
           <p class="final-score">SCORE: <span id="final-score">0</span></p>
           <p class="final-len">SNAKE LENGTH: <span id="final-len">3</span></p>
           <h3 class="lb-title">LEADERBOARD</h3>
