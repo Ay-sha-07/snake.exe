@@ -33,8 +33,7 @@ We built a full browser-based Snake game where the microphone is the controller.
   - Autocorrelation + Zero-Crossing Rate for pitch detection
   - LocalStorage fallback for offline scores
 
-**For Hardware:**  
-Not applicable (pure software project)
+
 
 ### Implementation
 
@@ -81,6 +80,7 @@ Then open `http://localhost:8000` and allow microphone access.
 
 ### Video
 https://drive.google.com/drive/folders/1eyWASZlBwcNhZ2aHh1W31N7kDWZh-wfO?usp=sharing 
+
 *Demo showing: starting the game → allowing microphone → controlling the snake with voice (hum left / whistle right) → eating the apple → crashing → submitting score to the leaderboard.*
 
 ### Additional Demos
@@ -95,7 +95,7 @@ https://drive.google.com/drive/folders/1eyWASZlBwcNhZ2aHh1W31N7kDWZh-wfO?usp=sha
 
 ---
 
-Made with ❤️ (and a lot of weird humming) at TinkerHub Useless Projects
+Made with ❤️  at TinkerHub Useless Projects
 
 ![Static Badge](https://img.shields.io/badge/TinkerHub-24?color=%23000000&link=https%3A%2F%2Fwww.tinkerhub.org%2F)
 ![Static Badge](https://img.shields.io/badge/UselessProjects--26-26?link=https%3A%2F%2Ftinkerhub.org%2Fevents%2F1M8ORET9A1%2Fuseless-projects-3.0)
