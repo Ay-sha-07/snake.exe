@@ -80,7 +80,7 @@ Then open `http://localhost:8000` and allow microphone access.
 ## Project Demo
 
 ### Video
-[Add your demo video link here]  
+https://drive.google.com/drive/folders/1eyWASZlBwcNhZ2aHh1W31N7kDWZh-wfO?usp=sharing 
 *Demo showing: starting the game → allowing microphone → controlling the snake with voice (hum left / whistle right) → eating the apple → crashing → submitting score to the leaderboard.*
 
 ### Additional Demos
