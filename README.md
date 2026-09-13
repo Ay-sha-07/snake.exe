@@ -2,17 +2,17 @@
 
 
 
-# [Project Name] 🎯
+# SNAKE.EXE 🎯
 
 
 ## Basic Details
-### Team Name: [Name]
+### Team Name: BYTE-ME
 
 
 ### Team Members
-- Team Lead: [Name] - [College]
-- Member 2: [Name] - [College]
-- Member 3: [Name] - [College]
+- Team Lead: AYISHA MOHAMMED - CUSAT
+- Member 2: HANNAH ACHU JOHN - CUSAT
+
 
 ### Project Description
 [2-3 lines about what your project does]
