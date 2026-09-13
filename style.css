@@ -20,7 +20,12 @@
 }
 
 body {
-  background: var(--bg-dark);
+  background-color: #000;
+  background-image: url('bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   color: var(--text);
   font-family: 'VT323', monospace;
   min-height: 100vh;
@@ -29,6 +34,16 @@ body {
   justify-content: center;
   overflow: hidden;
   position: relative;
+}
+
+/* darken background so windows stay readable */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 0;
+  pointer-events: none;
 }
 
 /* CRT / Scanline effects */
@@ -44,7 +59,7 @@ body {
     var(--scanline) 4px
   );
   z-index: 100;
-  opacity: 0.4;
+  opacity: 0.35;
 }
 
 .crt-overlay {
@@ -57,7 +72,7 @@ body {
 
 .container {
   position: relative;
-  z-index: 1;
+  z-index: 10;
   width: 100%;
   max-width: 640px;
   padding: 12px;
@@ -127,14 +142,15 @@ body {
 /* ===== COMPUTER WINDOW (name / login) ===== */
 .os-window {
   width: 100%;
-  max-width: 480px;
-  background: #0d1218;
+  max-width: 520px;
+  background: rgba(8, 12, 16, 0.92);
   border: 3px solid #3a4a5a;
   box-shadow:
     0 0 0 2px #1a222c,
-    8px 8px 0 rgba(0, 0, 0, 0.45),
-    0 0 40px rgba(155, 188, 15, 0.12);
+    8px 8px 0 rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(155, 188, 15, 0.15);
   image-rendering: pixelated;
+  backdrop-filter: blur(2px);
 }
 
 .os-titlebar {

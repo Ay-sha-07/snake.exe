@@ -16,24 +16,26 @@
   <div class="container">
     <!-- Title Screen -->
     <div id="title-screen" class="screen">
-      <div class="pixel-frame">
-        <p class="subtitle">"Shut up or crash out"</p>
-        <h1 class="title">SNAKE.EXE</h1>
-
-        <!-- Snake avatar image -->
-        <img src="snake-avatar.png" alt="Snake" class="snake-avatar-img" />
-
-        <p class="instruction">Scream to move. Hum to turn.</p>
-
-        <div class="menu-buttons">
-          <button id="start-btn" class="pixel-btn menu-btn">START</button>
-          <button id="howto-btn" class="pixel-btn menu-btn">HOW TO PLAY</button>
-          <button id="options-btn" class="pixel-btn menu-btn">OPTIONS</button>
-          <button id="leaderboard-btn" class="pixel-btn menu-btn">LEADERBOARD</button>
+      <div class="os-window">
+        <div class="os-titlebar">
+          <span class="os-btn os-btn-dead">■</span>
+          <span class="os-title">SNAKE.EXE — MAIN MENU</span>
+          <span class="os-btn os-btn-dead">×</span>
         </div>
-
-        <p class="controls-hint">
-        <span class="mic-hint">USE YOUR VOICE 🎙️</span></p>
+        <div class="os-body">
+          <p class="subtitle">"Shut up or crash out"</p>
+          <h1 class="title">SNAKE.EXE</h1>
+          <img src="snake-avatar.png" alt="Snake" class="snake-avatar-img" />
+          <p class="instruction">Scream to move. Hum to turn.</p>
+          <div class="menu-buttons">
+            <button id="start-btn" class="pixel-btn menu-btn">START</button>
+            <button id="howto-btn" class="pixel-btn menu-btn">HOW TO PLAY</button>
+            <button id="options-btn" class="pixel-btn menu-btn">OPTIONS</button>
+            <button id="leaderboard-btn" class="pixel-btn menu-btn">LEADERBOARD</button>
+          </div>
+          <p class="controls-hint">
+          <span class="mic-hint">USE YOUR VOICE 🎙️</span></p>
+        </div>
       </div>
     </div>
 
@@ -56,53 +58,71 @@
 
     <!-- How to Play Modal -->
     <div id="howto-screen" class="screen hidden">
-      <div class="pixel-frame modal">
-        <h2 class="modal-title">HOW TO PLAY</h2>
-        <div class="howto-content">
-          <p><span class="key">LOW HUM</span> → Turn LEFT (~100–250 Hz)</p>
-          <p><span class="key">HIGH "EEE"</span> → Turn RIGHT (~280+ Hz)</p>
-          <p><span class="key">LOUD VOLUME</span> → Speed Boost (any pitch)</p>
-          <p><span class="key">ARROW / WASD</span> → Keyboard control</p>
-          <p class="tip-text">Watch the PITCH meter to calibrate your voice.</p>
+      <div class="os-window">
+        <div class="os-titlebar">
+          <button id="howto-back" class="os-btn" title="Back">←</button>
+          <span class="os-title">SNAKE.EXE — HOW TO PLAY</span>
+          <span class="os-btn os-btn-dead">×</span>
         </div>
-        <button id="howto-back" class="pixel-btn">BACK</button>
+        <div class="os-body">
+          <h2 class="modal-title">HOW TO PLAY</h2>
+          <div class="howto-content">
+            <p><span class="key">LOW HUM</span> → Turn LEFT (~100–250 Hz)</p>
+            <p><span class="key">HIGH "EEE"</span> → Turn RIGHT (~280+ Hz)</p>
+            <p><span class="key">LOUD VOLUME</span> → Speed Boost (any pitch)</p>
+            <p><span class="key">ARROW / WASD</span> → Keyboard control</p>
+            <p class="tip-text">Watch the PITCH meter to calibrate your voice.</p>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- Options Modal -->
     <div id="options-screen" class="screen hidden">
-      <div class="pixel-frame modal">
-        <h2 class="modal-title">OPTIONS</h2>
-        <div class="options-content">
-          <label class="option-row">
-            <span>Microphone</span>
-            <button id="opt-mic-btn" class="pixel-btn small">ON</button>
-          </label>
-          <label class="option-row">
-            <span>Sound FX</span>
-            <button id="opt-sfx-btn" class="pixel-btn small">ON</button>
-          </label>
-          <label class="option-row">
-            <span>Difficulty</span>
-            <select id="opt-difficulty" class="pixel-select">
-              <option value="easy">EASY</option>
-              <option value="medium" selected>MEDIUM</option>
-              <option value="hard">HARD</option>
-            </select>
-          </label>
+      <div class="os-window">
+        <div class="os-titlebar">
+          <button id="options-back" class="os-btn" title="Back">←</button>
+          <span class="os-title">SNAKE.EXE — OPTIONS</span>
+          <span class="os-btn os-btn-dead">×</span>
         </div>
-        <button id="options-back" class="pixel-btn">BACK</button>
+        <div class="os-body">
+          <h2 class="modal-title">OPTIONS</h2>
+          <div class="options-content">
+            <label class="option-row">
+              <span>Microphone</span>
+              <button id="opt-mic-btn" class="pixel-btn small">ON</button>
+            </label>
+            <label class="option-row">
+              <span>Sound FX</span>
+              <button id="opt-sfx-btn" class="pixel-btn small">ON</button>
+            </label>
+            <label class="option-row">
+              <span>Difficulty</span>
+              <select id="opt-difficulty" class="pixel-select">
+                <option value="easy">EASY</option>
+                <option value="medium" selected>MEDIUM</option>
+                <option value="hard">HARD</option>
+              </select>
+            </label>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- Leaderboard Modal -->
     <div id="leaderboard-screen" class="screen hidden">
-      <div class="pixel-frame modal">
-        <h2 class="modal-title">LEADERBOARD</h2>
-        <div id="leaderboard-list" class="leaderboard-list">
-          <p class="empty">No scores yet. Be the first!</p>
+      <div class="os-window">
+        <div class="os-titlebar">
+          <button id="leaderboard-back" class="os-btn" title="Back">←</button>
+          <span class="os-title">SNAKE.EXE — LEADERBOARD</span>
+          <span class="os-btn os-btn-dead">×</span>
         </div>
-        <button id="leaderboard-back" class="pixel-btn">BACK</button>
+        <div class="os-body">
+          <h2 class="modal-title">LEADERBOARD</h2>
+          <div id="leaderboard-list" class="leaderboard-list">
+            <p class="empty">No scores yet. Be the first!</p>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -163,19 +183,23 @@
 
     <!-- Game Over Screen -->
     <div id="gameover-screen" class="screen hidden">
-      <div class="pixel-frame">
-        <h2 class="gameover-title">SYSTEM CRASH</h2>
-        <p class="final-score">SCORE: <span id="final-score">0</span></p>
-        <p class="final-len">SNAKE LENGTH: <span id="final-len">3</span></p>
-
-        <h3 class="lb-title">LEADERBOARD</h3>
-        <div id="gameover-leaderboard" class="leaderboard-list go-lb"></div>
-
-        <div class="go-buttons">
-          <button id="play-again-btn" class="pixel-btn">TRY AGAIN</button>
-          <button id="go-home-btn" class="pixel-btn">HOME</button>
+      <div class="os-window">
+        <div class="os-titlebar">
+          <button id="go-home-btn" class="os-btn" title="Home">←</button>
+          <span class="os-title">SNAKE.EXE — SYSTEM CRASH</span>
+          <span class="os-btn os-btn-dead">×</span>
         </div>
-        <p class="quote">"Every crash is a log entry."</p>
+        <div class="os-body">
+          <h2 class="gameover-title">SYSTEM CRASH</h2>
+          <p class="final-score">SCORE: <span id="final-score">0</span></p>
+          <p class="final-len">SNAKE LENGTH: <span id="final-len">3</span></p>
+          <h3 class="lb-title">LEADERBOARD</h3>
+          <div id="gameover-leaderboard" class="leaderboard-list go-lb"></div>
+          <div class="go-buttons">
+            <button id="play-again-btn" class="pixel-btn">TRY AGAIN</button>
+          </div>
+          <p class="quote">"Every crash is a log entry."</p>
+        </div>
       </div>
     </div>
   </div>
