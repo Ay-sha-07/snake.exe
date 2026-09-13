@@ -29,6 +29,66 @@ const DIFFICULTY_SPEEDS = {
   hard: 90
 };
 
+/* ---------- SFX (preloaded so they work in every mode) ---------- */
+let eatAudio = null;
+let crashAudio = null;
+
+function preloadSfx() {
+  try {
+    eatAudio = new Audio('eat.mp3');
+    eatAudio.preload = 'auto';
+    eatAudio.volume = 0.85;
+    eatAudio.load();
+  } catch (e) {}
+  try {
+    crashAudio = new Audio('crash.mp3');
+    crashAudio.preload = 'auto';
+    crashAudio.volume = 0.9;
+    crashAudio.load();
+  } catch (e) {}
+}
+
+function playEatSound() {
+  try {
+    if (!eatAudio) preloadSfx();
+    // clone so overlapping eats still play
+    const a = eatAudio.cloneNode();
+    a.volume = 0.85;
+    a.currentTime = 0;
+    a.play().catch(() => {
+      // fallback: recreate
+      const b = new Audio('eat.mp3');
+      b.volume = 0.85;
+      b.play().catch(() => {});
+    });
+  } catch (e) {
+    try {
+      new Audio('eat.mp3').play().catch(() => {});
+    } catch (_) {}
+  }
+}
+
+function playCrashSound() {
+  try {
+    if (!crashAudio) preloadSfx();
+    const a = crashAudio.cloneNode();
+    a.volume = 0.9;
+    a.currentTime = 0;
+    a.play().catch(() => {
+      const b = new Audio('crash.mp3');
+      b.volume = 0.9;
+      b.play().catch(() => {});
+    });
+  } catch (e) {
+    try {
+      new Audio('crash.mp3').play().catch(() => {});
+    } catch (_) {}
+  }
+}
+
+// Preload as soon as script loads
+preloadSfx();
+
 /* ---------- Mode wall layouts (24×24 grid) ---------- */
 function wallKey(x, y) { return x + ',' + y; }
 
@@ -340,12 +400,7 @@ function updateSnake() {
   // Eat food
   if (head.x === food.x && head.y === food.y) {
     score += 10;
-    // Eat apple sound (~5s clip)
-    try {
-      const eatSfx = new Audio('eat.mp3');
-      eatSfx.volume = 0.85;
-      eatSfx.play().catch(() => {});
-    } catch (e) {}
+    playEatSound();
     spawnFood();
     // slight speed up as you grow
     const minSpeed = difficulty === 'easy' ? 140 : difficulty === 'hard' ? 55 : 90;
@@ -475,15 +530,11 @@ function draw() {
 }
 
 function gameOver() {
+  if (isGameOver) return; // prevent double-fire
   isGameOver = true;
   isRunning = false;
 
-  // Play system crash sound
-  try {
-    const crashSfx = new Audio('crash.mp3');
-    crashSfx.volume = 0.9;
-    crashSfx.play().catch(() => {});
-  } catch (e) {}
+  playCrashSound();
 
   document.getElementById('final-score').textContent = score;
   document.getElementById('final-len').textContent = snake.length;
@@ -652,6 +703,27 @@ document.getElementById('start-game-btn')?.addEventListener('click', async () =>
     const st = document.getElementById('status-text');
     if (st) st.textContent = 'KEYBOARD MODE';
   }
+
+  // Unlock SFX on user gesture (needed for all modes)
+  preloadSfx();
+  try {
+    if (eatAudio) {
+      eatAudio.muted = true;
+      eatAudio.play().then(() => {
+        eatAudio.pause();
+        eatAudio.currentTime = 0;
+        eatAudio.muted = false;
+      }).catch(() => {});
+    }
+    if (crashAudio) {
+      crashAudio.muted = true;
+      crashAudio.play().then(() => {
+        crashAudio.pause();
+        crashAudio.currentTime = 0;
+        crashAudio.muted = false;
+      }).catch(() => {});
+    }
+  } catch (e) {}
 
   resetGame();
   showScreen('game-screen');
