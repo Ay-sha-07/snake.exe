@@ -103,18 +103,18 @@ function processVoiceControls(timestamp) {
     if (statusEl && statusEl.textContent === 'BOOST') statusEl.textContent = 'RUNNING';
   }
 
-  // Turn detection — need clear pitch + volume so noise doesn't turn you
-  // Low hum ~100–230 Hz = LEFT | High "eee" ~320+ Hz = RIGHT
-  // Wide mid gap (231–319) = ignore (cruising)
+  // Turn detection (balanced sensitivity)
+  // Low hum ~90–250 Hz = LEFT | High "eee" ~300+ Hz = RIGHT
+  // Mid gap ignored; soft noise still filtered in getPitch()
   let zone = 'none';
-  if (pitch >= 100 && pitch <= 230 && vol >= 0.05) zone = 'low';
-  else if (pitch >= 320 && vol >= 0.06) zone = 'high';
+  if (pitch >= 90 && pitch <= 250) zone = 'low';
+  else if (pitch >= 300) zone = 'high';
   else if (pitch > 0) zone = 'mid';
 
-  if (pitch <= 0 || zone === 'none') {
+  if (pitch <= 0) {
     if (actionEl) actionEl.textContent = 'SILENT';
     lastVoiceZone = 'none';
-  } else if (timestamp - lastTurnTime > 320) {
+  } else if (timestamp - lastTurnTime > 280) {
     if (zone === 'low' && lastVoiceZone !== 'low') {
       turnLeft();
       if (actionEl) actionEl.textContent = '← LEFT';

@@ -56,7 +56,7 @@ function getPitch() {
   const rms = getVolume();
 
   // Ignore quiet room noise / keyboard clicks
-  if (rms < 0.055) return -1;
+  if (rms < 0.03) return -1;
 
   // --- Autocorrelation (best for low "hmm") ---
   let r1 = 0;
@@ -108,10 +108,12 @@ function getPitch() {
   }
   const zcrFreq = (crossings / 2) / (SIZE / sampleRate);
 
-  if (autoFreq < 0 && zcrFreq >= 320 && rms >= 0.08) {
+  // ZCR backup for high "eee" when autocorrelation misses
+  if (zcrFreq >= 300 && rms >= 0.04 && (autoFreq < 0 || autoFreq > 300)) {
     return Math.min(zcrFreq, 900);
   }
   if (autoFreq > 280 && autoFreq <= 1200) return autoFreq;
+  if (autoFreq >= 80) return autoFreq;
 
   return -1;
 }
