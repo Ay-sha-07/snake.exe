@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SNAKE.EXE</title>
+  <title>SNAKE.EXE // Screaming Snake</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +18,7 @@
     <div id="title-screen" class="screen">
       <div class="os-window">
         <div class="os-titlebar">
-          <span class="os-btn os-btn-dead">■</span>
+          <img src="snake-avatar.png" alt="" class="os-icon" />
           <span class="os-title">SNAKE.EXE — MAIN MENU</span>
           <span class="os-btn os-btn-dead">×</span>
         </div>
@@ -33,8 +33,8 @@
             <button id="options-btn" class="pixel-btn menu-btn">OPTIONS</button>
             <button id="leaderboard-btn" class="pixel-btn menu-btn">LEADERBOARD</button>
           </div>
-          <p class="controls-hint">
-          <span class="mic-hint">USE YOUR VOICE 🎙️</span></p>
+          <p class="controls-hint">ARROW KEYS / WASD TO MOVE · SPACE TO INTERACT<br>
+          <span class="mic-hint">OR USE YOUR VOICE 🎙️</span></p>
         </div>
       </div>
     </div>
@@ -128,56 +128,64 @@
 
     <!-- Game Screen -->
     <div id="game-screen" class="screen hidden">
-      <button id="back-home-btn" class="icon-back game-back" title="Home" aria-label="Home">←</button>
-      <div class="hud">
-        <div class="hud-left">
-          <div class="score-box">
-            <span class="label">SCORE</span>
-            <span id="score-val">0000</span>
-          </div>
-          <div class="lives-box">
-            <span class="label">LEN</span>
-            <span id="len-val">003</span>
-          </div>
+      <div class="os-window os-window-game">
+        <div class="os-titlebar">
+          <button id="back-home-btn" class="os-btn" title="Home" aria-label="Home">←</button>
+          <span class="os-title">SNAKE.EXE — GAMEPLAY</span>
+          <span class="os-btn os-btn-dead">×</span>
         </div>
-        <div class="hud-center">
-          <h2 class="game-title">SCREAMING SNAKE</h2>
-          <div class="status" id="status-text">READY</div>
-        </div>
-        <div class="hud-right">
-          <div class="meter">
-            <span class="label">VOL</span>
-            <div class="bar-container">
-              <div id="vol-bar" class="bar"></div>
+        <div class="os-body os-body-game">
+          <div class="hud">
+            <div class="hud-left">
+              <div class="score-box">
+                <span class="label">SCORE</span>
+                <span id="score-val">0000</span>
+              </div>
+              <div class="lives-box">
+                <span class="label">LEN</span>
+                <span id="len-val">003</span>
+              </div>
             </div>
-            <span id="vol-val">0.00</span>
-          </div>
-          <div class="meter">
-            <span class="label">PITCH</span>
-            <div class="bar-container pitch">
-              <div id="pitch-bar" class="bar"></div>
+            <div class="hud-center">
+              <h2 class="game-title">SCREAMING SNAKE</h2>
+              <div class="status" id="status-text">READY</div>
             </div>
-            <span id="pitch-val">--- Hz</span>
+            <div class="hud-right">
+              <div class="meter">
+                <span class="label">VOL</span>
+                <div class="bar-container">
+                  <div id="vol-bar" class="bar"></div>
+                </div>
+                <span id="vol-val">0.00</span>
+              </div>
+              <div class="meter">
+                <span class="label">PITCH</span>
+                <div class="bar-container pitch">
+                  <div id="pitch-bar" class="bar"></div>
+                </div>
+                <span id="pitch-val">--- Hz</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="canvas-wrapper">
+            <canvas id="gameCanvas" width="480" height="480"></canvas>
+            <div class="nokia-bezel">
+              <div class="nokia-speaker"></div>
+            </div>
+          </div>
+
+          <div class="action-display">
+            <span id="action-val">NEUTRAL</span>
+            <span id="speed-indicator" class="speed-normal">1×</span>
+          </div>
+
+          <div class="footer-controls">
+            <button id="mute-btn" class="pixel-btn small">MIC ON</button>
+            <button id="restart-btn" class="pixel-btn small hidden">RESTART</button>
+            <p class="tip">Low hum → LEFT · High scream → RIGHT · LOUD → SPEED BOOST</p>
           </div>
         </div>
-      </div>
-
-      <div class="canvas-wrapper">
-        <canvas id="gameCanvas" width="480" height="480"></canvas>
-        <div class="nokia-bezel">
-          <div class="nokia-speaker"></div>
-        </div>
-      </div>
-
-      <div class="action-display">
-        <span id="action-val">NEUTRAL</span>
-        <span id="speed-indicator" class="speed-normal">1×</span>
-      </div>
-
-      <div class="footer-controls">
-        <button id="mute-btn" class="pixel-btn small">MIC ON</button>
-        <button id="restart-btn" class="pixel-btn small hidden">RESTART</button>
-        <p class="tip">Low hum → LEFT · High scream → RIGHT · LOUD → SPEED BOOST</p>
       </div>
     </div>
 

@@ -17,6 +17,7 @@ let score = 0;
 let isGameOver = false;
 let isRunning = false;
 let lastTurnTime = 0;
+let lastVoiceZone = 'none'; // only turn when entering low/high zone
 let useKeyboard = true;        // fallback if mic fails
 let difficulty = 'medium';
 
@@ -102,24 +103,30 @@ function processVoiceControls(timestamp) {
     if (statusEl && statusEl.textContent === 'BOOST') statusEl.textContent = 'RUNNING';
   }
 
-  // Turn detection with debounce
-  // Low hum ~100–250 Hz = LEFT | High "eee" ~280+ Hz = RIGHT
-  // (Many voices' "eee" lands ~280–400 Hz, so 360 was too strict)
-  // Speed boost is SEPARATE — based on VOLUME only (not pitch)
-  if (timestamp - lastTurnTime > 280 && pitch > 0) {
-    if (pitch >= 100 && pitch <= 250) {
+  // Turn detection — need clear pitch + volume so noise doesn't turn you
+  // Low hum ~100–230 Hz = LEFT | High "eee" ~320+ Hz = RIGHT
+  // Wide mid gap (231–319) = ignore (cruising)
+  let zone = 'none';
+  if (pitch >= 100 && pitch <= 230 && vol >= 0.05) zone = 'low';
+  else if (pitch >= 320 && vol >= 0.06) zone = 'high';
+  else if (pitch > 0) zone = 'mid';
+
+  if (pitch <= 0 || zone === 'none') {
+    if (actionEl) actionEl.textContent = 'SILENT';
+    lastVoiceZone = 'none';
+  } else if (timestamp - lastTurnTime > 320) {
+    if (zone === 'low' && lastVoiceZone !== 'low') {
       turnLeft();
       if (actionEl) actionEl.textContent = '← LEFT';
       lastTurnTime = timestamp;
-    } else if (pitch >= 280) {
+    } else if (zone === 'high' && lastVoiceZone !== 'high') {
       turnRight();
       if (actionEl) actionEl.textContent = 'RIGHT →';
       lastTurnTime = timestamp;
-    } else {
+    } else if (zone === 'mid') {
       if (actionEl) actionEl.textContent = 'CRUISING';
     }
-  } else if (pitch <= 0) {
-    if (actionEl) actionEl.textContent = 'SILENT';
+    lastVoiceZone = zone;
   }
 }
 
@@ -166,11 +173,11 @@ function updateSnake() {
   else if (direction === 'LEFT') head.x -= 1;
   else if (direction === 'RIGHT') head.x += 1;
 
-  // Wall collision
-  if (head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS) {
-    gameOver();
-    return;
-  }
+  // Wraparound walls — exit one side, appear on the opposite side
+  if (head.x < 0) head.x = COLS - 1;
+  else if (head.x >= COLS) head.x = 0;
+  if (head.y < 0) head.y = ROWS - 1;
+  else if (head.y >= ROWS) head.y = 0;
 
   // Self collision
   for (const part of snake) {

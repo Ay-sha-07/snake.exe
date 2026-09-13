@@ -43,69 +43,77 @@ function getVolume() {
 }
 
 /**
- * Autocorrelation pitch detection – reliable for humming / voice
- * Returns frequency in Hz, or -1 if silence / unreliable
+ * Pitch detection — autocorrelation primary (stable for hum).
+ * ZCR only as backup for clear high tones when auto fails.
+ * Higher noise floor to ignore room disturbances.
  */
 function getPitch() {
   if (!isAudioReady || !micEnabled) return -1;
 
   analyser.getFloatTimeDomainData(dataArray);
   const SIZE = dataArray.length;
+  const sampleRate = audioCtx.sampleRate;
   const rms = getVolume();
 
-  // Silence / noise floor (original sensitivity)
-  if (rms < 0.04) return -1;
+  // Ignore quiet room noise / keyboard clicks
+  if (rms < 0.055) return -1;
 
-  // Trim to non-silent region
+  // --- Autocorrelation (best for low "hmm") ---
   let r1 = 0;
   let r2 = SIZE - 1;
   const thres = 0.2;
-
   for (let i = 0; i < SIZE / 2; i++) {
-    if (Math.abs(dataArray[i]) < thres) {
-      r1 = i;
-      break;
-    }
+    if (Math.abs(dataArray[i]) < thres) { r1 = i; break; }
   }
   for (let i = 1; i < SIZE / 2; i++) {
-    if (Math.abs(dataArray[SIZE - i]) < thres) {
-      r2 = SIZE - i;
-      break;
-    }
+    if (Math.abs(dataArray[SIZE - i]) < thres) { r2 = SIZE - i; break; }
   }
-
   const trimmed = dataArray.slice(r1, r2);
-  if (trimmed.length < 32) return -1;
-
-  // Autocorrelation
-  const c = new Array(trimmed.length).fill(0);
-  for (let i = 0; i < trimmed.length; i++) {
-    for (let j = 0; j < trimmed.length - i; j++) {
-      c[i] += trimmed[j] * trimmed[j + i];
+  let autoFreq = -1;
+  if (trimmed.length >= 64) {
+    const c = new Array(trimmed.length).fill(0);
+    for (let i = 0; i < trimmed.length; i++) {
+      for (let j = 0; j < trimmed.length - i; j++) {
+        c[i] += trimmed[j] * trimmed[j + i];
+      }
     }
+    let d = 0;
+    while (d < c.length - 1 && c[d] > c[d + 1]) d++;
+    let maxval = -1;
+    let maxpos = -1;
+    const minLag = Math.floor(sampleRate / 800);
+    const maxLag = Math.floor(sampleRate / 80);
+    for (let i = Math.max(d, minLag); i < Math.min(c.length, maxLag); i++) {
+      if (c[i] > maxval) {
+        maxval = c[i];
+        maxpos = i;
+      }
+    }
+    if (maxpos > 0) autoFreq = sampleRate / maxpos;
   }
 
-  // Find first valley then peak
-  let d = 0;
-  while (d < c.length - 1 && c[d] > c[d + 1]) d++;
-
-  let maxval = -1;
-  let maxpos = -1;
-  for (let i = d; i < c.length; i++) {
-    if (c[i] > maxval) {
-      maxval = c[i];
-      maxpos = i;
-    }
+  // If autocorrelation found a clear low/mid pitch, trust it
+  // (don't let noisy ZCR flip "hmm" into a right turn)
+  if (autoFreq >= 80 && autoFreq <= 280) {
+    return autoFreq;
   }
 
-  if (maxpos <= 0) return -1;
+  // --- ZCR only when auto missed — and only for strong high tones ---
+  let crossings = 0;
+  for (let i = 1; i < SIZE; i++) {
+    if ((dataArray[i - 1] >= 0 && dataArray[i] < 0) ||
+        (dataArray[i - 1] < 0 && dataArray[i] >= 0)) {
+      crossings++;
+    }
+  }
+  const zcrFreq = (crossings / 2) / (SIZE / sampleRate);
 
-  const frequency = audioCtx.sampleRate / maxpos;
+  if (autoFreq < 0 && zcrFreq >= 320 && rms >= 0.08) {
+    return Math.min(zcrFreq, 900);
+  }
+  if (autoFreq > 280 && autoFreq <= 1200) return autoFreq;
 
-  // Human vocal range filter (ignore extremes)
-  if (frequency < 70 || frequency > 1200) return -1;
-
-  return frequency;
+  return -1;
 }
 
 function toggleMic() {
