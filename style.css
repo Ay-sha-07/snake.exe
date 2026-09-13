@@ -29,11 +29,16 @@ body {
   color: var(--text);
   font-family: 'VT323', monospace;
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   position: relative;
+  margin: 0;
+  padding: 0;
+  width: 100%;
 }
 
 /* slight darken so windows stay readable, keep matrix green visible */
@@ -76,12 +81,20 @@ body::before {
   width: 100%;
   max-width: 640px;
   padding: 12px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
 
 .screen {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
 .hidden {
@@ -144,6 +157,8 @@ body::before {
 .os-window {
   width: 100%;
   max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
   background: rgba(6, 18, 10, 0.92);
   border: 3px solid #3a7a3a;
   box-shadow:
@@ -153,6 +168,7 @@ body::before {
     inset 0 0 30px rgba(20, 60, 20, 0.3);
   image-rendering: pixelated;
   backdrop-filter: blur(2px);
+  box-sizing: border-box;
 }
 
 .os-titlebar {
@@ -703,9 +719,27 @@ body::before {
 
 /* Responsive */
 @media (max-width: 520px) {
+  body {
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    padding-left: max(8px, env(safe-area-inset-left));
+    padding-right: max(8px, env(safe-area-inset-right));
+  }
+  .container {
+    width: 100%;
+    max-width: 100%;
+    padding: 8px;
+    margin: 0 auto;
+  }
+  .os-window {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+  }
   .title { font-size: 18px; }
   .hud { flex-direction: column; align-items: center; }
   .hud-left, .hud-right { flex-direction: row; width: 100%; justify-content: center; }
-  #gameCanvas { width: 320px; height: 320px; }
+  #gameCanvas { width: 320px; height: 320px; max-width: 100%; }
   .canvas-wrapper { padding: 12px; }
 }

@@ -32,6 +32,8 @@ const DIFFICULTY_SPEEDS = {
 /* ---------- SFX (preloaded so they work in every mode) ---------- */
 let eatAudio = null;
 let crashAudio = null;
+let crashAudio2 = null;
+let crashToggle = 0; // alternates between crash.mp3 and crash2.mp3
 
 function preloadSfx() {
   try {
@@ -45,6 +47,12 @@ function preloadSfx() {
     crashAudio.preload = 'auto';
     crashAudio.volume = 0.9;
     crashAudio.load();
+  } catch (e) {}
+  try {
+    crashAudio2 = new Audio('crash2.mp3');
+    crashAudio2.preload = 'auto';
+    crashAudio2.volume = 0.9;
+    crashAudio2.load();
   } catch (e) {}
 }
 
@@ -70,12 +78,16 @@ function playEatSound() {
 
 function playCrashSound() {
   try {
-    if (!crashAudio) preloadSfx();
-    const a = crashAudio.cloneNode();
+    if (!crashAudio || !crashAudio2) preloadSfx();
+    // Alternate: faah ↔ cat laugh
+    const src = (crashToggle % 2 === 0) ? crashAudio : crashAudio2;
+    const fallback = (crashToggle % 2 === 0) ? 'crash.mp3' : 'crash2.mp3';
+    crashToggle++;
+    const a = src.cloneNode();
     a.volume = 0.9;
     a.currentTime = 0;
     a.play().catch(() => {
-      const b = new Audio('crash.mp3');
+      const b = new Audio(fallback);
       b.volume = 0.9;
       b.play().catch(() => {});
     });
@@ -721,6 +733,14 @@ document.getElementById('start-game-btn')?.addEventListener('click', async () =>
         crashAudio.pause();
         crashAudio.currentTime = 0;
         crashAudio.muted = false;
+      }).catch(() => {});
+    }
+    if (crashAudio2) {
+      crashAudio2.muted = true;
+      crashAudio2.play().then(() => {
+        crashAudio2.pause();
+        crashAudio2.currentTime = 0;
+        crashAudio2.muted = false;
       }).catch(() => {});
     }
   } catch (e) {}
