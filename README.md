@@ -2,47 +2,51 @@
 
 
 
-# [Project Name] 🎯
+# SNAKE.EXE 🎯
 
 
 ## Basic Details
-### Team Name: [Name]
+### Team Name: BYTE-ME
 
 
 ### Team Members
-- Team Lead: [Name] - [College]
-- Member 2: [Name] - [College]
-- Member 3: [Name] - [College]
+- Team Lead: AYISHA MOHAMMED - CUSAT
+- Member 2: HANNAH ACHU JOHN - CUSAT
+
 
 ### Project Description
-[2-3 lines about what your project does]
+SNAKE.EXE is a classic Snake game reborn as a voice-controlled chaos machine. Instead of arrow keys, you control the snake by humming low to turn left and whistling/eeeing high to turn right. Complete with CRT scanlines, pixel-art UI, live pitch meter, difficulty modes, and a global leaderboard — because the world needed one more reason to scream at a computer.
 
 ### The Problem (that doesn't exist)
-[What ridiculous problem are you solving?]
+People have two hands. Keyboards have too many keys. And modern life is full of quiet, polite ways to play games. This is unacceptable. We needed a game that forces you to make weird noises in public (or in a quiet library) just to survive.
 
 ### The Solution (that nobody asked for)
-[How are you solving it? Keep it fun!]
+We built a full browser-based Snake game where the microphone is the controller. Real-time pitch detection turns your voice into left/right commands. Low “mmm/hum” = left, high “eee/whistle” = right. Keyboard is only a backup for cowards. Add a retro OS window aesthetic, glowing pitch meters, and a Supabase leaderboard so you can prove you screamed the loudest.
 
 ## Technical Details
 ### Technologies/Components Used
 For Software:
-- [Languages used]
-- [Frameworks used]
-- [Libraries used]
-- [Tools used]
+- Languages used: HTML5, CSS3, JavaScript (Vanilla)
+- Libraries used:
+  Web Audio API (microphone + pitch/volume analysis)
+  Supabase JS client (online leaderboard)
+- Tools used:
+  Canvas 2D for game rendering
+  Autocorrelation + Zero-Crossing Rate for pitch detection
+  LocalStorage fallback for offline scores
 
-For Hardware:
-- [List main components]
-- [List specifications]
-- [List tools required]
 
 ### Implementation
 For Software:
-# Installation
-[commands]
 
 # Run
-[commands]
+# Option 1: Open directly
+open index.html          # or double-click it
+
+# Option 2: Serve locally (recommended for mic permissions)
+npx serve .
+# or
+python -m http.server 8000
 
 ### Project Documentation
 For Software:
