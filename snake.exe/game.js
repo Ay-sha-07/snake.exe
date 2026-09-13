@@ -20,129 +20,12 @@ let lastTurnTime = 0;
 let lastVoiceZone = 'none'; // only turn when entering low/high zone
 let useKeyboard = true;        // fallback if mic fails
 let difficulty = 'medium';
-let gameMode = 'classic';
-let walls = new Set();         // "x,y" keys for solid cells
 
 const DIFFICULTY_SPEEDS = {
   easy: 200,
   medium: 150,
   hard: 90
 };
-
-/* ---------- Mode wall layouts (24×24 grid) ---------- */
-function wallKey(x, y) { return x + ',' + y; }
-
-function isWall(x, y) {
-  return walls.has(wallKey(x, y));
-}
-
-function buildWalls(mode) {
-  walls = new Set();
-  const W = COLS;
-  const H = ROWS;
-
-  if (mode === 'classic') {
-    // open field + wraparound — no walls
-    return;
-  }
-
-  if (mode === 'box') {
-    // solid border
-    for (let x = 0; x < W; x++) {
-      walls.add(wallKey(x, 0));
-      walls.add(wallKey(x, H - 1));
-    }
-    for (let y = 0; y < H; y++) {
-      walls.add(wallKey(0, y));
-      walls.add(wallKey(W - 1, y));
-    }
-    return;
-  }
-
-  if (mode === 'tunnel') {
-    // two long parallel horizontal walls → tight corridors
-    // leave gaps at left & right ends so snake can pass between lanes
-    for (let x = 3; x < W - 3; x++) {
-      walls.add(wallKey(x, 7));
-      walls.add(wallKey(x, 16));
-    }
-    return;
-  }
-
-  if (mode === 'rails') {
-    // multiple broken parallel lines (railroad tracks)
-    const railYs = [5, 9, 14, 18];
-    for (const y of railYs) {
-      for (let x = 2; x < W - 2; x++) {
-        // broken segments — gaps every few cells
-        if (x % 5 !== 0 && x % 5 !== 1) {
-          walls.add(wallKey(x, y));
-        }
-      }
-    }
-    return;
-  }
-
-  if (mode === 'mills') {
-    // four large L-shaped corner blocks (windmill sails)
-    // top-left L
-    for (let i = 2; i <= 8; i++) walls.add(wallKey(i, 2));
-    for (let i = 2; i <= 8; i++) walls.add(wallKey(2, i));
-    // top-right L
-    for (let i = W - 9; i <= W - 3; i++) walls.add(wallKey(i, 2));
-    for (let i = 2; i <= 8; i++) walls.add(wallKey(W - 3, i));
-    // bottom-left L
-    for (let i = 2; i <= 8; i++) walls.add(wallKey(i, H - 3));
-    for (let i = H - 9; i <= H - 3; i++) walls.add(wallKey(2, i));
-    // bottom-right L
-    for (let i = W - 9; i <= W - 3; i++) walls.add(wallKey(i, H - 3));
-    for (let i = H - 9; i <= H - 3; i++) walls.add(wallKey(W - 3, i));
-    return;
-  }
-
-  if (mode === 'apartment') {
-    // grid of rooms with narrow doorways
-    // vertical dividers
-    const vLines = [8, 15];
-    for (const vx of vLines) {
-      for (let y = 1; y < H - 1; y++) {
-        // leave doorways
-        if (y !== 6 && y !== 7 && y !== 16 && y !== 17) {
-          walls.add(wallKey(vx, y));
-        }
-      }
-    }
-    // horizontal dividers
-    const hLines = [8, 15];
-    for (const hy of hLines) {
-      for (let x = 1; x < W - 1; x++) {
-        if (x !== 4 && x !== 5 && x !== 11 && x !== 12 && x !== 18 && x !== 19) {
-          walls.add(wallKey(x, hy));
-        }
-      }
-    }
-    return;
-  }
-
-  if (mode === 'pillars') {
-    // individual solid blocks / pillars in the center
-    const pillars = [
-      [6, 6], [6, 7], [7, 6], [7, 7],
-      [16, 6], [16, 7], [17, 6], [17, 7],
-      [6, 16], [6, 17], [7, 16], [7, 17],
-      [16, 16], [16, 17], [17, 16], [17, 17],
-      [11, 11], [12, 11], [11, 12], [12, 12],
-      [4, 11], [5, 12],
-      [18, 11], [19, 12],
-      [11, 4], [12, 5],
-      [11, 18], [12, 19]
-    ];
-    for (const [x, y] of pillars) {
-      if (x >= 0 && x < W && y >= 0 && y < H) walls.add(wallKey(x, y));
-    }
-    return;
-  }
-}
 
 // Keyboard fallback (WASD / arrows)
 const keyMap = {
@@ -203,21 +86,14 @@ function processVoiceControls(timestamp) {
     if (pitchBar) pitchBar.style.width = '0%';
   }
 
-  // Volume boost (scream) → 2× speed
-  if (vol > 0.22) {
-    currentSpeed = 65; // ~2.3× faster
-    if (speedInd) {
-      speedInd.textContent = '2×';
-      speedInd.className = 'speed-boost';
-    }
-    if (statusEl) statusEl.textContent = 'BOOST';
-  } else {
-    currentSpeed = baseSpeed;
-    if (speedInd) {
-      speedInd.textContent = '1×';
-      speedInd.className = 'speed-normal';
-    }
-    if (statusEl && statusEl.textContent === 'BOOST') statusEl.textContent = 'RUNNING';
+  // No speed boost — keep steady speed (user requested)
+  currentSpeed = baseSpeed;
+  if (speedInd) {
+    speedInd.textContent = '1×';
+    speedInd.className = 'speed-normal';
+  }
+  if (statusEl && (statusEl.textContent === 'BOOST' || statusEl.textContent === '')) {
+    statusEl.textContent = 'RUNNING';
   }
 
   // Turn detection
@@ -259,40 +135,25 @@ function processVoiceControls(timestamp) {
 /* ---------- Game logic ---------- */
 function spawnFood() {
   let valid = false;
-  let attempts = 0;
-  while (!valid && attempts < 500) {
+  while (!valid) {
     food = {
       x: Math.floor(Math.random() * COLS),
       y: Math.floor(Math.random() * ROWS)
     };
-    valid = !snake.some(s => s.x === food.x && s.y === food.y) && !isWall(food.x, food.y);
-    attempts++;
+    valid = !snake.some(s => s.x === food.x && s.y === food.y);
   }
 }
 
 function resetGame() {
-  // Apply difficulty + mode
+  // Apply difficulty speed
   const sel = document.getElementById('opt-difficulty');
   if (sel) difficulty = sel.value;
   baseSpeed = DIFFICULTY_SPEEDS[difficulty] || 150;
 
-  const modeSel = document.getElementById('opt-mode');
-  if (modeSel) gameMode = modeSel.value || 'classic';
-  buildWalls(gameMode);
-
-  // Safe start position (avoid walls)
-  let startX = 8, startY = 10;
-  if (isWall(startX, startY) || isWall(startX - 1, startY) || isWall(startX - 2, startY)) {
-    startX = 4; startY = 12;
-  }
-  if (isWall(startX, startY)) {
-    startX = 3; startY = 3;
-  }
-
   snake = [
-    { x: startX, y: startY },
-    { x: startX - 1, y: startY },
-    { x: startX - 2, y: startY }
+    { x: 8, y: 10 },
+    { x: 7, y: 10 },
+    { x: 6, y: 10 }
   ];
   direction = 'RIGHT';
   nextDirection = 'RIGHT';
@@ -314,24 +175,11 @@ function updateSnake() {
   else if (direction === 'LEFT') head.x -= 1;
   else if (direction === 'RIGHT') head.x += 1;
 
-  // Classic = wraparound; all other modes = solid walls / out-of-bounds = death
-  if (gameMode === 'classic') {
-    if (head.x < 0) head.x = COLS - 1;
-    else if (head.x >= COLS) head.x = 0;
-    if (head.y < 0) head.y = ROWS - 1;
-    else if (head.y >= ROWS) head.y = 0;
-  } else {
-    if (head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS || isWall(head.x, head.y)) {
-      gameOver();
-      return;
-    }
-  }
-
-  // Wall collision (also for classic if any walls ever exist)
-  if (isWall(head.x, head.y)) {
-    gameOver();
-    return;
-  }
+  // Wraparound walls — exit one side, appear on the opposite side
+  if (head.x < 0) head.x = COLS - 1;
+  else if (head.x >= COLS) head.x = 0;
+  if (head.y < 0) head.y = ROWS - 1;
+  else if (head.y >= ROWS) head.y = 0;
 
   // Self collision
   for (const part of snake) {
@@ -418,21 +266,6 @@ function draw() {
     ctx.moveTo(0, y * GRID);
     ctx.lineTo(canvas.width, y * GRID);
     ctx.stroke();
-  }
-
-  // Walls / obstacles (mode layouts) — yellow like the buttons
-  if (walls.size > 0) {
-    ctx.fillStyle = '#f0c040';
-    walls.forEach(key => {
-      const [wx, wy] = key.split(',').map(Number);
-      ctx.fillRect(wx * GRID + 1, wy * GRID + 1, GRID - 2, GRID - 2);
-    });
-    // slightly darker inner for depth
-    ctx.fillStyle = '#d4a820';
-    walls.forEach(key => {
-      const [wx, wy] = key.split(',').map(Number);
-      ctx.fillRect(wx * GRID + 3, wy * GRID + 3, GRID - 6, GRID - 6);
-    });
   }
 
   // Food – cute apple
@@ -582,7 +415,7 @@ function getPlayerName() {
 }
 
 function getModeLabel() {
-  return (gameMode || 'classic') + '-' + (difficulty || 'medium');
+  return difficulty || 'medium';
 }
 
 function saveScore(score) {
